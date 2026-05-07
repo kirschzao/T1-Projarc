@@ -86,4 +86,3 @@ Acesse no seu navegador:
 ## 📂 Estrutura do Projeto
 
 O projeto procura manter os níveis com um isolamento adequado uns dos outros , seguindo os princípios da **Arquitetura Limpa** conforme discutido em aula e apresentado no estudo de caso.
-# T1-Projarc
