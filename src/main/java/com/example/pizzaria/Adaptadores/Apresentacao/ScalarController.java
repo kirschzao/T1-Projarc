@@ -31,7 +31,7 @@ public class ScalarController {
                     <script
                       id="api-reference"
                       data-url="/v3/api-docs"
-                      data-configuration='{"theme":"default","darkMode":true,"layout":"modern"}'>
+                      data-configuration='{"theme":"default","darkMode":true,"layout":"modern","authentication":{"preferredSecurityScheme":"basicAuth","http":{"basic":{"username":"admin","password":"admin"}}}}'>
                     </script>
                     <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
                   </body>
