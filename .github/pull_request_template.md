@@ -1,4 +1,4 @@
-## 🔗 UC da atividade
+## 🔗 UC da Atividade
 
 <!-- Informe aqui o ID da task relacionada no ClickUp -->
 
