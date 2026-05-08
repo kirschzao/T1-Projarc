@@ -5,9 +5,18 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
+@Tag(name = " Scalar", description = "Endpoint para o /docs")
+
 public class ScalarController {
 
+  @Operation(
+        summary = "Carregar documentação do Scalar", 
+        description = "Retorna a docs do Scalar"
+    )
     @GetMapping(value = "/docs", produces = MediaType.TEXT_HTML_VALUE)
     public String docs() {
         return """
