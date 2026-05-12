@@ -9,11 +9,11 @@ import java.util.concurrent.TimeUnit;
 import com.example.pizzaria.Dominio.Entidades.Pedido;
 
 public class CozinhaService implements ICozinhaService {
-    private Queue<Pedido> filaEntrada;
+    private final Queue<Pedido> filaEntrada;
     private Pedido emPreparacao;
-    private Queue<Pedido> filaSaida;
+    private final Queue<Pedido> filaSaida;
 
-    private ScheduledExecutorService scheduler;
+    private final ScheduledExecutorService scheduler;
 
     public CozinhaService() {
         filaEntrada = new LinkedBlockingQueue<Pedido>();

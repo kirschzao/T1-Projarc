@@ -3,7 +3,8 @@ package com.example.pizzaria.Dominio.Servicos;
 import org.springframework.stereotype.Service;
 
 @Service
-public class DescontoService {
+public class DescontoService implements IDescontoService {
+    @Override
     public double calcularDesconto(String emailCliente, double valorTotal) {
         boolean elegivelParaDesconto = false; 
         if (elegivelParaDesconto) {

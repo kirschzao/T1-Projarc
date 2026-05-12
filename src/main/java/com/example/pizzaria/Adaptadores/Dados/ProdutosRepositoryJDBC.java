@@ -8,14 +8,13 @@ import org.springframework.stereotype.Component;
 
 import com.example.pizzaria.Dominio.Dados.ProdutosRepository;
 import com.example.pizzaria.Dominio.Dados.ReceitasRepository;
-import com.example.pizzaria.Dominio.Entidades.Ingrediente;
 import com.example.pizzaria.Dominio.Entidades.Produto;
 import com.example.pizzaria.Dominio.Entidades.Receita;
 
 @Component
 public class ProdutosRepositoryJDBC implements ProdutosRepository {
-    private JdbcTemplate jdbcTemplate;
-    private ReceitasRepository receitasRepository;
+    private final JdbcTemplate jdbcTemplate;
+    private final ReceitasRepository receitasRepository;
 
     @Autowired
     public ProdutosRepositoryJDBC(JdbcTemplate jdbcTemplate,ReceitasRepository receitasRepository){

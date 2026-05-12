@@ -8,14 +8,14 @@ import org.springframework.stereotype.Component;
 import com.example.pizzaria.Aplicacao.Responses.CardapioResponse;
 import com.example.pizzaria.Dominio.Entidades.Cardapio;
 import com.example.pizzaria.Dominio.Entidades.Produto;
-import com.example.pizzaria.Dominio.Servicos.CardapioService;
+import com.example.pizzaria.Dominio.Servicos.ICardapioService;
 
 @Component
 public class RecuperarCardapioUC {
-    private CardapioService cardapioService;
+    private final ICardapioService cardapioService;
 
     @Autowired
-    public RecuperarCardapioUC(CardapioService cardapioService){
+    public RecuperarCardapioUC(ICardapioService cardapioService){
         this.cardapioService = cardapioService;
     }
 

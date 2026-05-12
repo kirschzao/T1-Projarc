@@ -4,14 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.example.pizzaria.Aplicacao.Responses.CabecalhoCardapioResponse;
-import com.example.pizzaria.Dominio.Servicos.CardapioService;
+import com.example.pizzaria.Dominio.Servicos.ICardapioService;
 
 @Component
 public class RecuperaListaCardapiosUC {
-    private CardapioService cardapioService;
+    private final ICardapioService cardapioService;
 
     @Autowired
-    public RecuperaListaCardapiosUC(CardapioService cardapioService){
+    public RecuperaListaCardapiosUC(ICardapioService cardapioService){
         this.cardapioService = cardapioService;
     }
 
