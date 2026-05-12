@@ -10,7 +10,6 @@ public class PagamentoServiceFake implements IPagamentoService {
     @Override
     public boolean processarPagamento(long pedidoId, double valor) {
         // sempre aprova pagamentos
-        System.out.println("Pagamento fake aprovado para pedido: " + pedidoId + " valor=" + valor);
         return true;
     }
 }

@@ -12,6 +12,5 @@ public class EntregaServiceFake implements IEntregaService {
     public void agendarEntrega(Pedido pedido) {
         // Simula agendamento e atualiza status do pedido em memória
         pedido.setStatus(Pedido.Status.TRANSPORTE);
-        System.out.println("Entrega fake agendada para pedido: " + pedido.getId());
     }
 }
