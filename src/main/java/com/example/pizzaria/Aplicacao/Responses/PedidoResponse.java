@@ -1,6 +1,5 @@
 package com.example.pizzaria.Aplicacao.Responses;
 
-import com.example.pizzaria.Dominio.Entidades.Pedido;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "Objeto de resposta com o resultado da avaliação do pedido")

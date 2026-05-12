@@ -1,39 +1,24 @@
 package com.example.pizzaria.Dominio.Entidades;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
 public class Produto {
     private long id;
+
+    @NotBlank
     private String descricao;
+
+    @NotNull
     private Receita receita;
+
+    @Positive
     private int preco;
-
-    public Produto(long id,String descricao, Receita receita, int preco) {
-        if (!Produto.precoValido(preco))
-            throw new IllegalArgumentException("Preco invalido: " + preco);
-        if (descricao == null || descricao.length() == 0)
-            throw new IllegalArgumentException("Descricao invalida");
-        if (receita == null)
-            throw new IllegalArgumentException("Receita invalida");
-        this.id = id;
-        this.descricao = descricao;
-        this.receita = receita;
-        this.preco = preco;
-    }
-
-    public long getId(){
-        return id;
-    }
-
-    public String getDescricao() {
-        return descricao;
-    }
-
-    public Receita getReceita() {
-        return receita;
-    }
-
-    public int getPreco() {
-        return preco;
-    }
 
     public void setPreco(int preco) {
         if (!Produto.precoValido(preco))
@@ -50,5 +35,5 @@ public class Produto {
     public String toString() {
         return "Produto [id=" + id + ", descricao=" + descricao + ", receita=" + receita + ", preco=" + preco + "]";
     }
-    
+
 }

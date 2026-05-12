@@ -2,6 +2,9 @@ package com.example.pizzaria.Dominio.Entidades;
 
 import java.util.List;
 
+import lombok.Getter;
+
+@Getter
 public class Cardapio {
     private CabecalhoCardapio cabecalhoCardapio;
     private List<Produto> produtos;
@@ -10,7 +13,5 @@ public class Cardapio {
         this.cabecalhoCardapio = cabecalhoCardapio;
         this.produtos = produtos;
     }
-    public CabecalhoCardapio getCabecalhoCardapio(){ return cabecalhoCardapio; }
-    public List<Produto> getProdutos() { return produtos; }
     public void setProdutos(List<Produto> produtos){this.produtos = produtos;}
 }

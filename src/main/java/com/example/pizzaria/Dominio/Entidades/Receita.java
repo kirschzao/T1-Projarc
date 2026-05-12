@@ -2,18 +2,22 @@ package com.example.pizzaria.Dominio.Entidades;
 
 import java.util.List;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
 public class Receita {
+    @Positive
     private long id;
+
+    @NotBlank
     private String titulo;
+
+    @NotNull
     private List<Ingrediente> ingredientes;
 
-    public Receita(long id, String titulo, List<Ingrediente> ingredientes) {
-        this.id = id;
-        this.titulo = titulo;
-        this.ingredientes = ingredientes;
-    }
-
-    public long getId() { return id; }
-    public String getTitulo(){ return titulo; }
-    public List<Ingrediente> getIngredientes() { return ingredientes; }
 }

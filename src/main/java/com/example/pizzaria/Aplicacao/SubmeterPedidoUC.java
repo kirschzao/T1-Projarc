@@ -1,6 +1,5 @@
 package com.example.pizzaria.Aplicacao;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,38 +8,31 @@ import org.springframework.stereotype.Component;
 import com.example.pizzaria.Aplicacao.Requests.ItemPedidoRequest;
 import com.example.pizzaria.Aplicacao.Requests.SubmeterPedidoRequest;
 import com.example.pizzaria.Aplicacao.Responses.PedidoResponse;
-import com.example.pizzaria.Dominio.Dados.ProdutosRepository;
 import com.example.pizzaria.Dominio.Entidades.Cliente;
 import com.example.pizzaria.Dominio.Entidades.ItemPedido;
 import com.example.pizzaria.Dominio.Entidades.Pedido;
 import com.example.pizzaria.Dominio.Entidades.Produto;
-import com.example.pizzaria.Dominio.Servicos.DescontoService;
+import com.example.pizzaria.Dominio.Servicos.IDescontoService;
 import com.example.pizzaria.Dominio.Servicos.IEstoqueService;
-import com.example.pizzaria.Dominio.Servicos.ImpostoService;
+import com.example.pizzaria.Dominio.Servicos.IImpostoService;
+import com.example.pizzaria.Dominio.Servicos.IProdutoService;
+
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class SubmeterPedidoUC {
-    private final ProdutosRepository produtosRepository;
+    private final IProdutoService produtoService;
     private final IEstoqueService estoqueService;
-    private final ImpostoService impostoService;
-    private final DescontoService descontoService;
-
-    public SubmeterPedidoUC(ProdutosRepository produtosRepository, 
-                            IEstoqueService estoqueService, 
-                            ImpostoService impostoService, 
-                            DescontoService descontoService) {
-        this.produtosRepository = produtosRepository;
-        this.estoqueService = estoqueService;
-        this.impostoService = impostoService;
-        this.descontoService = descontoService;
-    }
+    private final IImpostoService impostoService;
+    private final IDescontoService descontoService;
 
     public PedidoResponse run(SubmeterPedidoRequest request) {
         List<ItemPedido> itensDoPedido = new ArrayList<>();
 
         // 1. Instanciar os itens do domínio
         for (ItemPedidoRequest reqItem : request.itens()) {
-            Produto produto = produtosRepository.recuperaProdutoPorid(reqItem.produtoId());
+            Produto produto = produtoService.recuperaProdutoPorId(reqItem.produtoId());
             if (produto == null) {
                 return new PedidoResponse("NEGADO", 0, 0, 0, 0, "Produto ID " + reqItem.produtoId() + " não encontrado.");
             }

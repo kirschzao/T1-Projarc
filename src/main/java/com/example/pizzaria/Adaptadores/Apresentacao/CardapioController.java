@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.pizzaria.Adaptadores.Apresentacao.Presenters.CabecalhoCardapioPresenter;
 import com.example.pizzaria.Adaptadores.Apresentacao.Presenters.CardapioPresenter;
+import com.example.pizzaria.Adaptadores.Apresentacao.Presenters.ItemCardapioPresenter;
 import com.example.pizzaria.Aplicacao.CarregarCardapioCorrenteUC;
 import com.example.pizzaria.Aplicacao.RecuperaListaCardapiosUC;
 import com.example.pizzaria.Aplicacao.RecuperarCardapioUC;
 import com.example.pizzaria.Aplicacao.Responses.CardapioResponse;
-
 import com.example.pizzaria.Dominio.Entidades.Produto;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -66,19 +66,18 @@ public class CardapioController {
             .map(Produto::getId)
             .toList());
 
-        CardapioPresenter cardapioPresenter = new CardapioPresenter(
-            cardapioResponse.getCardapio().getCabecalhoCardapio().titulo()
-        );
+        List<ItemCardapioPresenter> itens = cardapioResponse.getCardapio().getProdutos().stream()
+            .map(produto -> new ItemCardapioPresenter(
+                produto.getId(),
+                produto.getDescricao(),
+                produto.getPreco(),
+                conjIdSugestoes.contains(produto.getId())
+            ))
+            .toList();
 
-        for (Produto produto : cardapioResponse.getCardapio().getProdutos()) {
-            boolean sugestao = conjIdSugestoes.contains(produto.getId());
-            cardapioPresenter.insereItem(
-                produto.getId(), 
-                produto.getDescricao(), 
-                produto.getPreco(), 
-                sugestao
-            );
-        }
-        return cardapioPresenter;
+        return new CardapioPresenter(
+            cardapioResponse.getCardapio().getCabecalhoCardapio().titulo(),
+            itens
+        );
     }
 }
