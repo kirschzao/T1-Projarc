@@ -12,45 +12,73 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.pizzaria.Adaptadores.Apresentacao.Presenters.CabecalhoCardapioPresenter;
 import com.example.pizzaria.Adaptadores.Apresentacao.Presenters.CardapioPresenter;
+import com.example.pizzaria.Aplicacao.CarregarCardapioCorrenteUC;
 import com.example.pizzaria.Aplicacao.RecuperaListaCardapiosUC;
 import com.example.pizzaria.Aplicacao.RecuperarCardapioUC;
 import com.example.pizzaria.Aplicacao.Responses.CardapioResponse;
+
 import com.example.pizzaria.Dominio.Entidades.Produto;
 
-@RestController
-@RequestMapping("/cardapio")
-public class CardapioController {
-    private RecuperarCardapioUC recuperaCardapioUC;
-    private RecuperaListaCardapiosUC recuperaListaCardapioUC;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 
-    public CardapioController(RecuperarCardapioUC recuperaCardapioUC,
-                              RecuperaListaCardapiosUC recuperaListaCardapioUC) {
-        this.recuperaCardapioUC = recuperaCardapioUC;
-        this.recuperaListaCardapioUC = recuperaListaCardapioUC;
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/cardapio")
+@Tag(name = "Cardápio", description = "Operações para consulta de cardápios e sugestões do chef")
+public class CardapioController {
+    private final RecuperarCardapioUC recuperaCardapioUC;
+    private final RecuperaListaCardapiosUC recuperaListaCardapioUC;
+    private final CarregarCardapioCorrenteUC carregarCardapioCorrenteUC;
+
+
+    @GetMapping("/corrente")
+    @CrossOrigin("*")
+    @Operation(
+        summary = "Carregar cardápio corrente (UC3)", 
+        description = "Retorna o cardápio padrão do sistema (ID 1 nesta versão) para que o cliente possa iniciar a montagem do pedido."
+    )
+    public CardapioPresenter recuperaCardapioCorrente() {
+        CardapioResponse cardapioResponse = carregarCardapioCorrenteUC.run();
+        return mapearParaPresenter(cardapioResponse);
     }
 
     @GetMapping("/{id}")
     @CrossOrigin("*")
-    public CardapioPresenter recuperaCardapio(@PathVariable(value="id")long id){
+    @Operation(summary = "Recuperar cardápio por ID", description = "Retorna os detalhes de um cardápio específico e as sugestões do chef vigentes.")
+    public CardapioPresenter recuperaCardapio(@PathVariable(value="id") long id) {
         CardapioResponse cardapioResponse = recuperaCardapioUC.run(id);
-        Set<Long> conjIdSugestoes = new HashSet<>(cardapioResponse.getSugestoesDoChef().stream()
-            .map(produto->produto.getId())
-            .toList());
-        CardapioPresenter cardapioPresenter = new CardapioPresenter(cardapioResponse.getCardapio().getCabecalhoCardapio().titulo());
-        for(Produto produto:cardapioResponse.getCardapio().getProdutos()){
-            boolean sugestao = conjIdSugestoes.contains(produto.getId());
-            cardapioPresenter.insereItem(produto.getId(), produto.getDescricao(), produto.getPreco(), sugestao);
-        }
-        return cardapioPresenter;
+        return mapearParaPresenter(cardapioResponse);
     }
 
     @GetMapping("/lista")
     @CrossOrigin("*")
-    public List<CabecalhoCardapioPresenter> recuperaListaCardapios(){
-         List<CabecalhoCardapioPresenter> lstCardapios = 
-            recuperaListaCardapioUC.run().cabecalhos().stream()
-            .map(cabCar -> new CabecalhoCardapioPresenter(cabCar.id(),cabCar.titulo()))
+    @Operation(summary = "Listar cardápios disponíveis", description = "Retorna uma lista simplificada com os títulos e IDs de todos os cardápios cadastrados.")
+    public List<CabecalhoCardapioPresenter> recuperaListaCardapios() {
+         return recuperaListaCardapioUC.run().cabecalhos().stream()
+            .map(cabCar -> new CabecalhoCardapioPresenter(cabCar.id(), cabCar.titulo()))
             .toList();
-         return lstCardapios;
+    }
+
+    private CardapioPresenter mapearParaPresenter(CardapioResponse cardapioResponse) {
+        Set<Long> conjIdSugestoes = new HashSet<>(cardapioResponse.getSugestoesDoChef().stream()
+            .map(Produto::getId)
+            .toList());
+
+        CardapioPresenter cardapioPresenter = new CardapioPresenter(
+            cardapioResponse.getCardapio().getCabecalhoCardapio().titulo()
+        );
+
+        for (Produto produto : cardapioResponse.getCardapio().getProdutos()) {
+            boolean sugestao = conjIdSugestoes.contains(produto.getId());
+            cardapioPresenter.insereItem(
+                produto.getId(), 
+                produto.getDescricao(), 
+                produto.getPreco(), 
+                sugestao
+            );
+        }
+        return cardapioPresenter;
     }
 }

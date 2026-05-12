@@ -5,9 +5,18 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
+@Tag(name = " Scalar", description = "Endpoint para o /docs")
+
 public class ScalarController {
 
+  @Operation(
+        summary = "Carregar documentação do Scalar", 
+        description = "Retorna a docs do Scalar"
+    )
     @GetMapping(value = "/docs", produces = MediaType.TEXT_HTML_VALUE)
     public String docs() {
         return """
@@ -22,7 +31,7 @@ public class ScalarController {
                     <script
                       id="api-reference"
                       data-url="/v3/api-docs"
-                      data-configuration='{"theme":"default","darkMode":true,"layout":"modern"}'>
+                      data-configuration='{"theme":"default","darkMode":true,"layout":"modern","authentication":{"preferredSecurityScheme":"basicAuth","http":{"basic":{"username":"admin","password":"admin"}}}}'>
                     </script>
                     <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
                   </body>
