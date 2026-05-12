@@ -12,18 +12,16 @@ import com.example.pizzaria.Aplicacao.Responses.PedidoResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/pedidos")
 @CrossOrigin("*")
+@RequiredArgsConstructor
 @Tag(name = "Pedidos", description = "Operações relacionadas à gestão de pedidos")
 public class PedidoController {
 
     private final SubmeterPedidoUC submeterPedidoUC;
-
-    public PedidoController(SubmeterPedidoUC submeterPedidoUC) {
-        this.submeterPedidoUC = submeterPedidoUC;
-    }
 
     @PostMapping("/submeter")
     @Operation(

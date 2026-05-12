@@ -16,12 +16,15 @@ import com.example.pizzaria.Aplicacao.CarregarCardapioCorrenteUC;
 import com.example.pizzaria.Aplicacao.RecuperaListaCardapiosUC;
 import com.example.pizzaria.Aplicacao.RecuperarCardapioUC;
 import com.example.pizzaria.Aplicacao.Responses.CardapioResponse;
+
 import com.example.pizzaria.Dominio.Entidades.Produto;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/cardapio")
 @Tag(name = "Cardápio", description = "Operações para consulta de cardápios e sugestões do chef")
 public class CardapioController {
@@ -29,13 +32,6 @@ public class CardapioController {
     private final RecuperaListaCardapiosUC recuperaListaCardapioUC;
     private final CarregarCardapioCorrenteUC carregarCardapioCorrenteUC;
 
-    public CardapioController(RecuperarCardapioUC recuperaCardapioUC,
-                              RecuperaListaCardapiosUC recuperaListaCardapioUC,
-                              CarregarCardapioCorrenteUC carregarCardapioCorrenteUC) {
-        this.recuperaCardapioUC = recuperaCardapioUC;
-        this.recuperaListaCardapioUC = recuperaListaCardapioUC;
-        this.carregarCardapioCorrenteUC = carregarCardapioCorrenteUC;
-    }
 
     @GetMapping("/corrente")
     @CrossOrigin("*")
