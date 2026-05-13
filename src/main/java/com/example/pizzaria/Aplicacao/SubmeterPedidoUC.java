@@ -1,8 +1,13 @@
 package com.example.pizzaria.Aplicacao;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.example.pizzaria.Aplicacao.Requests.ItemPedidoRequest;
@@ -34,32 +39,49 @@ public class SubmeterPedidoUC {
     public PedidoResponse run(SubmeterPedidoRequest request) {
         List<ItemPedido> itensDoPedido = new ArrayList<>();
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String emailAutenticado = authentication != null ? authentication.getName() : null;
+        if (emailAutenticado == null || emailAutenticado.isBlank() || "anonymousUser".equals(emailAutenticado)) {
+            return new PedidoResponse(0, "NEGADO", 0, 0, 0, 0, "Usuário não autenticado.");
+        }
+
         // 0. Recuperar cliente por email
-        Cliente cliente = clienteService.recuperarPorEmail(request.emailCliente());
+        Cliente cliente = clienteService.recuperarPorEmail(emailAutenticado);
         if (cliente == null) {
             return new PedidoResponse(0, "NEGADO", 0, 0, 0, 0, "Cliente não encontrado. Por favor, cadastre-se antes de fazer um pedido.");
         }
 
         // 1. Instanciar os itens do domínio
+        Set<Long> itensJaIndisponiveis = new LinkedHashSet<>();
         for (ItemPedidoRequest reqItem : request.itens()) {
             Produto produto = produtoService.recuperaProdutoPorId(reqItem.produtoId());
             if (produto == null) {
                 return new PedidoResponse(0, "NEGADO", 0, 0, 0, 0, "Produto ID " + reqItem.produtoId() + " não encontrado.");
             }
+            if (!produto.isDisponivel()) {
+                itensJaIndisponiveis.add(produto.getId());
+            }
             itensDoPedido.add(new ItemPedido(produto, reqItem.quantidade()));
         }
 
-        // 2. Verificação de Estoque
-        if (!estoqueService.verificaDisponibilidade(itensDoPedido)) {
-            return new PedidoResponse(0, "NEGADO", 0, 0, 0, 0, "Estoque insuficiente para um ou mais ingredientes.");
+        if (!itensJaIndisponiveis.isEmpty()) {
+            String itensIndisponiveis = itensDoPedido.stream()
+                .map(ItemPedido::getItem)
+                .filter(produto -> itensJaIndisponiveis.contains(produto.getId()))
+                .map(Produto::getDescricao)
+                .distinct()
+                .collect(Collectors.joining(", "));
+
+            return new PedidoResponse(0, "NEGADO", 0, 0, 0, 0,
+                "Pedido contém itens indisponíveis no cardápio: " + itensIndisponiveis + ".");
         }
 
-        // 3. Cálculos Financeiros
+        // 2. Cálculos financeiros (pedido é criado inicialmente como NOVO)
         double valorTotalItens = itensDoPedido.stream()
                 .mapToDouble(item -> item.getItem().getPreco() * item.getQuantidade())
                 .sum();
 
-        double desconto = descontoService.calcularDesconto(request.emailCliente(), valorTotalItens);
+        double desconto = descontoService.calcularDesconto(emailAutenticado, valorTotalItens);
         double imposto = impostoService.calcularImposto(valorTotalItens);
         
         double valorCobrado = (valorTotalItens - desconto) + imposto;
@@ -70,14 +92,15 @@ public class SubmeterPedidoUC {
             cliente.getNome(),
             cliente.getCelular(),
             request.enderecoEntrega(),
-            cliente.getEmail()
+            cliente.getEmail(),
+            cliente.getSenha()
         );
         
         Pedido pedido = new Pedido(
             0, 
             clienteComEndereco,
             itensDoPedido, 
-            Pedido.Status.APROVADO, 
+            Pedido.Status.NOVO, 
             valorTotalItens, 
             imposto, 
             desconto, 
@@ -87,9 +110,42 @@ public class SubmeterPedidoUC {
         // 4. Persistir o pedido
         Pedido pedidoSalvo = pedidoService.salvar(pedido);
 
+        // 5. Verificação de estoque após criação do pedido NOVO
+        if (!estoqueService.verificaDisponibilidade(itensDoPedido)) {
+            List<Long> produtosIndisponiveis = estoqueService.identificarProdutosIndisponiveis(itensDoPedido);
+            for (Long produtoId : produtosIndisponiveis) {
+                produtoService.marcarComoIndisponivel(produtoId);
+            }
+
+            String itensNaoAtendidos = itensDoPedido.stream()
+                .map(ItemPedido::getItem)
+                .filter(produto -> produtosIndisponiveis.contains(produto.getId()))
+                .map(Produto::getDescricao)
+                .distinct()
+                .collect(Collectors.joining(", "));
+
+            String mensagem = itensNaoAtendidos.isBlank()
+                ? "Estoque insuficiente para um ou mais ingredientes."
+                : "Estoque insuficiente. Itens não atendidos: " + itensNaoAtendidos + ". Itens foram marcados como indisponíveis.";
+
+            return new PedidoResponse(
+                pedidoSalvo.getId(),
+                "NEGADO",
+                0,
+                0,
+                0,
+                0,
+                mensagem
+            );
+        }
+
+        // 6. Com estoque OK, pedido passa para APROVADO
+        pedidoSalvo.setStatus(Pedido.Status.APROVADO);
+        pedidoService.atualizar(pedidoSalvo);
+
         return new PedidoResponse(
             pedidoSalvo.getId(),
-            pedidoSalvo.getStatus().name(),
+            Pedido.Status.APROVADO.name(),
             pedidoSalvo.getValor(),
             pedidoSalvo.getImpostos(),
             pedidoSalvo.getDesconto(),

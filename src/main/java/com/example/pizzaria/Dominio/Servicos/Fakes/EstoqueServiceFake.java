@@ -14,4 +14,11 @@ public class EstoqueServiceFake implements IEstoqueService {
     public boolean verificaDisponibilidade(List<ItemPedido> itens) {
         return true;
     }
+
+    @Override
+    public List<Long> identificarProdutosIndisponiveis(List<ItemPedido> itensDoPedido) {
+        return List.of();
+    }
+
+    
 }

@@ -71,7 +71,8 @@ public class CardapioController {
                 produto.getId(),
                 produto.getDescricao(),
                 produto.getPreco(),
-                conjIdSugestoes.contains(produto.getId())
+                conjIdSugestoes.contains(produto.getId()),
+                produto.isDisponivel()
             ))
             .toList();
 

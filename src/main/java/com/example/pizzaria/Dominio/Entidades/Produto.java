@@ -18,7 +18,13 @@ public class Produto {
     @Positive
     private int preco;
 
+    private boolean disponivel;
+
     public Produto(long id, String descricao, Receita receita, int preco) {
+        this(id, descricao, receita, preco, true);
+    }
+
+    public Produto(long id, String descricao, Receita receita, int preco, boolean disponivel) {
         if (descricao == null || descricao.isBlank()) {
             throw new IllegalArgumentException("Descricao nao pode ser nula ou vazia");
         }
@@ -33,12 +39,17 @@ public class Produto {
         this.descricao = descricao;
         this.receita = receita;
         this.preco = preco;
+        this.disponivel = disponivel;
     }
 
     public void setPreco(int preco) {
         if (!Produto.precoValido(preco))
             throw new IllegalArgumentException("Preco invalido: " + preco);
         this.preco = preco;
+    }
+
+    public void setDisponivel(boolean disponivel) {
+        this.disponivel = disponivel;
     }
 
     // Valida um preco (preco em centavos)

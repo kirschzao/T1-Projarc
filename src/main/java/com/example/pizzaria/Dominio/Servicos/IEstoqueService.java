@@ -6,4 +6,6 @@ import com.example.pizzaria.Dominio.Entidades.ItemPedido;
 
 public interface IEstoqueService {
     boolean verificaDisponibilidade(List<ItemPedido> itens);
+
+    List<Long> identificarProdutosIndisponiveis(List<ItemPedido> itensDoPedido);
 }

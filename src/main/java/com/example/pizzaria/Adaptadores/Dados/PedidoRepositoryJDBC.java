@@ -116,7 +116,7 @@ public class PedidoRepositoryJDBC implements PedidoRepository {
         Cliente cliente = clienteRepository.recuperarPorCpf(clienteCpf);
         if (cliente == null) {
             // Fallback se cliente não encontrado
-            cliente = new Cliente("N/A", "N/A", "N/A", "N/A", "N/A");
+            cliente = new Cliente("N/A", "N/A", "N/A", "N/A", "N/A", "N/A");
         }
 
         return new Pedido(id, cliente, itens, status, valor, impostos, desconto, valorCobrado);

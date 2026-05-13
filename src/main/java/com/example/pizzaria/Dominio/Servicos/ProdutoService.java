@@ -18,4 +18,9 @@ public class ProdutoService implements IProdutoService {
     public Produto recuperaProdutoPorId(long id) {
         return produtosRepository.recuperaProdutoPorid(id);
     }
+
+    @Override
+    public void marcarComoIndisponivel(long id) {
+        produtosRepository.atualizarDisponibilidade(id, false);
+    }
 }

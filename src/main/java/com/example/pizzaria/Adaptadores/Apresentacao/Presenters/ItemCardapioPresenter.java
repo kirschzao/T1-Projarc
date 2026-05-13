@@ -19,4 +19,7 @@ public class ItemCardapioPresenter {
 
     @Schema(description = "Indica se o produto é uma sugestão do chef", example = "true")
     private final boolean indicacao;
+
+    @Schema(description = "Indica se o item está disponível para pedido", example = "true")
+    private final boolean disponivel;
 }
