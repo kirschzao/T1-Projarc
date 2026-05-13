@@ -1,6 +1,5 @@
 package com.example.pizzaria.Dominio.Entidades;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.validation.constraints.NotNull;
@@ -19,7 +18,8 @@ public class Pedido {
         PREPARACAO,
         PRONTO,
         TRANSPORTE,
-        ENTREGUE
+        ENTREGUE,
+        CANCELADO
     }
 
     @PositiveOrZero
@@ -27,8 +27,6 @@ public class Pedido {
 
     @NotNull
     private Cliente cliente;
-
-    private LocalDateTime dataHoraPagamento;
 
     @NotNull
     private List<ItemPedido> itens;
