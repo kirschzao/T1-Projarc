@@ -1,21 +1,18 @@
 package com.example.pizzaria.Aplicacao;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.example.pizzaria.Aplicacao.Responses.CabecalhoCardapioResponse;
-import com.example.pizzaria.Dominio.Servicos.ICardapioService;
+import com.example.pizzaria.Dominio.Servicos.CardapioService;
+
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class RecuperaListaCardapiosUC {
-    private final ICardapioService cardapioService;
+    private final CardapioService cardapioService;
 
-    @Autowired
-    public RecuperaListaCardapiosUC(ICardapioService cardapioService){
-        this.cardapioService = cardapioService;
-    }
-
-    public CabecalhoCardapioResponse run(){
+    public CabecalhoCardapioResponse run() {
         return new CabecalhoCardapioResponse(cardapioService.recuperaListaDeCardapios());
-    }    
+    }
 }

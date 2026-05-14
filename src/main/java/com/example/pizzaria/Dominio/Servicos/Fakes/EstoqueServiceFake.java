@@ -5,10 +5,10 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.example.pizzaria.Dominio.Entidades.ItemPedido;
-import com.example.pizzaria.Dominio.Servicos.IEstoqueService;
+import com.example.pizzaria.Dominio.Servicos.EstoqueService;
 
 @Service
-public class EstoqueServiceFake implements IEstoqueService {
+public class EstoqueServiceFake implements EstoqueService {
 
     @Override
     public boolean verificaDisponibilidade(List<ItemPedido> itens) {
@@ -19,6 +19,4 @@ public class EstoqueServiceFake implements IEstoqueService {
     public List<Long> identificarProdutosIndisponiveis(List<ItemPedido> itensDoPedido) {
         return List.of();
     }
-
-    
 }

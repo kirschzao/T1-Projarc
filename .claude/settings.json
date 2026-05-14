@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(PWD_GEN=$\\(grep \"Using generated security password\" /tmp/pizzaria-run.log | sed -E 's/.*password: //' | tr -d ' ' | tail -1\\); echo \"=== GET /cardapio/lista \\(autenticado\\) ===\"; curl -s -u \"user:$PWD_GEN\" -H \"Accept: application/json\" http://localhost:8080/cardapio/lista; echo; echo; echo \"=== GET /cardapio/1 \\(autenticado\\) ===\"; curl -s -u \"user:$PWD_GEN\" -H \"Accept: application/json\" http://localhost:8080/cardapio/1 | head -c 800; echo)",
-      "Read(//private/tmp/**)"
-    ]
-  }
-}

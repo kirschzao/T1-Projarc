@@ -2,14 +2,13 @@ package com.example.pizzaria.Dominio.Servicos.Fakes;
 
 import org.springframework.stereotype.Service;
 
-import com.example.pizzaria.Dominio.Servicos.IPagamentoService;
+import com.example.pizzaria.Dominio.Servicos.PagamentoService;
 
 @Service
-public class PagamentoServiceFake implements IPagamentoService {
+public class PagamentoServiceFake implements PagamentoService {
 
     @Override
     public boolean processarPagamento(long pedidoId, double valor) {
-        // sempre aprova pagamentos
         return true;
     }
 }

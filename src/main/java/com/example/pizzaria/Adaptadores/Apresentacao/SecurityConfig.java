@@ -37,6 +37,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/docs", "/v3/api-docs/**", "/h2/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/auth/registrar").permitAll()
+                .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/pedidos/submeter").authenticated()
                 .requestMatchers(HttpMethod.GET, "/pedidos/**").authenticated()
                 .requestMatchers(HttpMethod.POST, "/pedidos/*/cancelar").authenticated()

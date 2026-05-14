@@ -2,6 +2,6 @@ package com.example.pizzaria.Dominio.Servicos;
 
 import com.example.pizzaria.Dominio.Entidades.Pedido;
 
-public interface IEntregaService {
+public interface EntregaService {
     void agendarEntrega(Pedido pedido);
 }

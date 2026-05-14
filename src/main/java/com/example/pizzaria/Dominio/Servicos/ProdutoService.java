@@ -4,22 +4,24 @@ import org.springframework.stereotype.Service;
 
 import com.example.pizzaria.Dominio.Dados.ProdutosRepository;
 import com.example.pizzaria.Dominio.Entidades.Produto;
+import com.example.pizzaria.Dominio.Exceptions.RecursoNaoEncontradoException;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
-public class ProdutoService implements IProdutoService {
+@RequiredArgsConstructor
+public class ProdutoService {
 
     private final ProdutosRepository produtosRepository;
 
-    public ProdutoService(ProdutosRepository produtosRepository) {
-        this.produtosRepository = produtosRepository;
-    }
-
-    @Override
     public Produto recuperaProdutoPorId(long id) {
-        return produtosRepository.recuperaProdutoPorid(id);
+        Produto produto = produtosRepository.recuperaProdutoPorid(id);
+        if (produto == null) {
+            throw new RecursoNaoEncontradoException("Produto ID " + id + " não encontrado.");
+        }
+        return produto;
     }
 
-    @Override
     public void marcarComoIndisponivel(long id) {
         produtosRepository.atualizarDisponibilidade(id, false);
     }

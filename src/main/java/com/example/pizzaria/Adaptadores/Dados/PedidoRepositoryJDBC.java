@@ -91,6 +91,13 @@ public class PedidoRepositoryJDBC implements PedidoRepository {
         );
     }
 
+    @Override
+    public int contarPedidosPorClienteNoPeriodo(String cpf, int dias) {
+        String sql = "SELECT COUNT(*) FROM pedidos WHERE cliente_cpf = ? AND data_criacao >= DATEADD('DAY', ?, CURRENT_TIMESTAMP)";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, cpf, -dias);
+        return count != null ? count : 0;
+    }
+
     private Pedido mapearPedido(ResultSet rs) throws SQLException {
         long id = rs.getLong("id");
         String clienteCpf = rs.getString("cliente_cpf");
