@@ -1,10 +1,11 @@
 package com.example.pizzaria.Aplicacao.Responses;
 
-import com.example.pizzaria.Dominio.Entidades.Pedido;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "Objeto de resposta com o resultado da avaliação do pedido")
 public record PedidoResponse(
+    @Schema(description = "ID do Pedido gerado", example = "1")
+    long pedidoId,
     @Schema(description = "Status do Pedido (APROVADO, NEGADO)", example = "APROVADO")
     String status,
     @Schema(description = "Valor total dos itens", example = "11000")

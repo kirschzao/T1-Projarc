@@ -7,4 +7,5 @@ import com.example.pizzaria.Dominio.Entidades.Produto;
 public interface ProdutosRepository {
     Produto recuperaProdutoPorid(long id);
     List<Produto> recuperaProdutosCardapio(long id);
+    void atualizarDisponibilidade(long produtoId, boolean disponivel);
 }

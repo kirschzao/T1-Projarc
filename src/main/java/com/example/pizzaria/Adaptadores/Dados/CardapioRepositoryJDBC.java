@@ -1,7 +1,6 @@
 package com.example.pizzaria.Adaptadores.Dados;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -15,8 +14,8 @@ import com.example.pizzaria.Dominio.Entidades.Produto;
 
 @Component
 public class CardapioRepositoryJDBC implements CardapioRepository{
-    private JdbcTemplate jdbcTemplate;
-    private ProdutosRepository produtosRepository;
+    private final JdbcTemplate jdbcTemplate;
+    private final ProdutosRepository produtosRepository;
 
     @Autowired
     public CardapioRepositoryJDBC(JdbcTemplate jdbcTemplate,ProdutosRepository  produtosRepository){

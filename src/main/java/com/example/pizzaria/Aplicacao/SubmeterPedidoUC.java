@@ -1,83 +1,57 @@
 package com.example.pizzaria.Aplicacao;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.example.pizzaria.Aplicacao.Requests.ItemPedidoRequest;
 import com.example.pizzaria.Aplicacao.Requests.SubmeterPedidoRequest;
 import com.example.pizzaria.Aplicacao.Responses.PedidoResponse;
-import com.example.pizzaria.Dominio.Dados.ProdutosRepository;
 import com.example.pizzaria.Dominio.Entidades.Cliente;
 import com.example.pizzaria.Dominio.Entidades.ItemPedido;
 import com.example.pizzaria.Dominio.Entidades.Pedido;
-import com.example.pizzaria.Dominio.Entidades.Produto;
-import com.example.pizzaria.Dominio.Servicos.DescontoService;
-import com.example.pizzaria.Dominio.Servicos.IEstoqueService;
-import com.example.pizzaria.Dominio.Servicos.ImpostoService;
+import com.example.pizzaria.Dominio.Exceptions.RegraDeNegocioException;
+import com.example.pizzaria.Dominio.Servicos.ClienteService;
+import com.example.pizzaria.Dominio.Servicos.PedidoService;
+
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class SubmeterPedidoUC {
-    private final ProdutosRepository produtosRepository;
-    private final IEstoqueService estoqueService;
-    private final ImpostoService impostoService;
-    private final DescontoService descontoService;
-
-    public SubmeterPedidoUC(ProdutosRepository produtosRepository, 
-                            IEstoqueService estoqueService, 
-                            ImpostoService impostoService, 
-                            DescontoService descontoService) {
-        this.produtosRepository = produtosRepository;
-        this.estoqueService = estoqueService;
-        this.impostoService = impostoService;
-        this.descontoService = descontoService;
-    }
+    private final PedidoService pedidoService;
+    private final ClienteService clienteService;
 
     public PedidoResponse run(SubmeterPedidoRequest request) {
-        List<ItemPedido> itensDoPedido = new ArrayList<>();
-
-        // 1. Instanciar os itens do domínio
-        for (ItemPedidoRequest reqItem : request.itens()) {
-            Produto produto = produtosRepository.recuperaProdutoPorid(reqItem.produtoId());
-            if (produto == null) {
-                return new PedidoResponse("NEGADO", 0, 0, 0, 0, "Produto ID " + reqItem.produtoId() + " não encontrado.");
-            }
-            itensDoPedido.add(new ItemPedido(produto, reqItem.quantidade()));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String emailAutenticado = authentication != null ? authentication.getName() : null;
+        if (emailAutenticado == null || emailAutenticado.isBlank() || "anonymousUser".equals(emailAutenticado)) {
+            throw new RegraDeNegocioException("Usuário não autenticado.");
         }
 
-        // 2. Verificação de Estoque
-        if (!estoqueService.verificaDisponibilidade(itensDoPedido)) {
-            return new PedidoResponse("NEGADO", 0, 0, 0, 0, "Estoque insuficiente para um ou mais ingredientes.");
+        Cliente cliente = clienteService.recuperarPorEmail(emailAutenticado);
+
+        List<Long> produtoIds = new ArrayList<>();
+        List<Integer> quantidades = new ArrayList<>();
+        for (ItemPedidoRequest item : request.itens()) {
+            produtoIds.add(item.produtoId());
+            quantidades.add(item.quantidade());
         }
 
-        // 3. Cálculos Financeiros
-        double valorTotalItens = itensDoPedido.stream()
-                .mapToDouble(item -> item.getItem().getPreco() * item.getQuantidade())
-                .sum();
+        List<ItemPedido> itens = pedidoService.validarECriarItens(produtoIds, quantidades);
+        Pedido pedido = pedidoService.criarPedido(cliente, itens, request.enderecoEntrega());
 
-        double desconto = descontoService.calcularDesconto(request.emailCliente(), valorTotalItens);
-        double imposto = impostoService.calcularImposto(valorTotalItens);
-        
-        double valorCobrado = (valorTotalItens - desconto) + imposto;
-
-        Cliente clienteRef = new Cliente("N/A", "N/A", "N/A", request.enderecoEntrega(), request.emailCliente());
-        
-        Pedido pedido = new Pedido(
-            0, 
-            clienteRef, 
-            null, 
-            itensDoPedido, 
-            Pedido.Status.APROVADO, 
-            valorTotalItens, 
-            imposto, 
-            desconto, 
-            valorCobrado
-        );
+        String erroEstoque = pedidoService.verificarEstoqueEAprovar(pedido, itens);
+        if (erroEstoque != null) {
+            return new PedidoResponse(pedido.getId(), "NEGADO", 0, 0, 0, 0, erroEstoque);
+        }
 
         return new PedidoResponse(
-            pedido.getStatus().name(),
+            pedido.getId(),
+            Pedido.Status.APROVADO.name(),
             pedido.getValor(),
             pedido.getImpostos(),
             pedido.getDesconto(),

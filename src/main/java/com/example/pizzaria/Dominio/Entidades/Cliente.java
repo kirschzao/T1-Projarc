@@ -1,23 +1,27 @@
 package com.example.pizzaria.Dominio.Entidades;
 
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
 public class Cliente {
+    @NotBlank
     private String cpf;
+
+    @NotBlank
     private String nome;
+
+    @NotBlank
     private String celular;
+
+    @NotBlank
     private String endereco;
+
+    @NotBlank
     private String email;
 
-    public Cliente(String cpf, String nome, String celular, String endereco, String email) {
-        this.cpf = cpf;
-        this.nome = nome;
-        this.celular = celular;
-        this.endereco = endereco;
-        this.email = email;
-    }
-
-    public String getCpf() { return cpf; }
-    public String getNome() { return nome; }
-    public String getCelular() { return celular; }
-    public String getEndereco() { return endereco; }
-    public String getEmail() { return email; }
+    @NotBlank
+    private String senha;
 }

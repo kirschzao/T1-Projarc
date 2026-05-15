@@ -2,18 +2,20 @@
 package com.example.pizzaria.Adaptadores.Dados;
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import com.example.pizzaria.Dominio.Entidades.Ingrediente;
-import com.example.pizzaria.Dominio.Entidades.Receita;
+
 import com.example.pizzaria.Dominio.Dados.IngredientesRepository;
 import com.example.pizzaria.Dominio.Dados.ReceitasRepository;
+import com.example.pizzaria.Dominio.Entidades.Ingrediente;
+import com.example.pizzaria.Dominio.Entidades.Receita;
 
 @Repository
 public class ReceitasRepositoryJDBC implements ReceitasRepository {
-	private JdbcTemplate jdbcTemplate;
-    private IngredientesRepository ingredientesRepository;
+	private final JdbcTemplate jdbcTemplate;
+    private final IngredientesRepository ingredientesRepository;
 
 	@Autowired
 	public ReceitasRepositoryJDBC(JdbcTemplate jdbcTemplate,IngredientesRepository ingredientesRepository) {

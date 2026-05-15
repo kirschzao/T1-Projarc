@@ -1,6 +1,7 @@
 -- Inserção dos clientes
-INSERT INTO clientes (cpf, nome, celular, endereco, email) VALUES ('9001', 'Huguinho Pato', '51985744566', 'Rua das Flores, 100', 'huguinho.pato@email.com');
-INSERT INTO clientes (cpf, nome, celular, endereco, email) VALUES ('9002', 'Luizinho Pato', '5199172079', 'Av. Central, 200', 'zezinho.pato@email.com');
+-- Senhas: 123456 (criptografadas com BCrypt)
+INSERT INTO clientes (cpf, nome, celular, endereco, email, senha) VALUES ('9001', 'Huguinho Pato', '51985744566', 'Rua das Flores, 100', 'huguinho.pato@email.com', '$2a$10$slYQmyNdGzin7olVN3p5OPST9/PgBkqquzi8Ss7KIUgO2t0jWMUga');
+INSERT INTO clientes (cpf, nome, celular, endereco, email, senha) VALUES ('9002', 'Luizinho Pato', '5199172079', 'Av. Central, 200', 'zezinho.pato@email.com', '$2a$10$slYQmyNdGzin7olVN3p5OPST9/PgBkqquzi8Ss7KIUgO2t0jWMUga');
 
 -- Inserção dos ingredientes
 INSERT INTO ingredientes (id, descricao) VALUES (1, 'Disco de pizza');
