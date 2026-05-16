@@ -66,13 +66,14 @@ public class PedidoRepositoryJDBC implements PedidoRepository {
             pedido.getValor(),
             pedido.getImpostos(),
             pedido.getDesconto(),
-            pedido.getValorCobrado()
+            pedido.getValorCobrado(),
+            java.time.LocalDateTime.now()
         );
     }
 
     @Override
     public Pedido recuperarPorId(long id) {
-        String sql = "SELECT id, cliente_cpf, status, valor, impostos, desconto, valor_cobrado " +
+        String sql = "SELECT id, cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao " +
                      "FROM pedidos WHERE id = ?";
         
         List<Pedido> pedidos = jdbcTemplate.query(sql, ps -> ps.setLong(1, id), 
@@ -98,6 +99,27 @@ public class PedidoRepositoryJDBC implements PedidoRepository {
         return count != null ? count : 0;
     }
 
+    @Override
+    public List<Pedido> recuperarEntreguesPorData(java.time.LocalDateTime inicio, java.time.LocalDateTime fim) {
+        String sql = "SELECT id, cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao " +
+                     "FROM pedidos WHERE status = 'ENTREGUE' AND data_criacao BETWEEN ? AND ?";
+        return jdbcTemplate.query(sql, ps -> {
+            ps.setObject(1, inicio);
+            ps.setObject(2, fim);
+        }, (rs, rowNum) -> mapearPedido(rs));
+    }
+
+    @Override
+    public List<Pedido> recuperarEntreguesPorClienteEData(String cpf, java.time.LocalDateTime inicio, java.time.LocalDateTime fim) {
+        String sql = "SELECT id, cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao " +
+                     "FROM pedidos WHERE cliente_cpf = ? AND status = 'ENTREGUE' AND data_criacao BETWEEN ? AND ?";
+        return jdbcTemplate.query(sql, ps -> {
+            ps.setString(1, cpf);
+            ps.setObject(2, inicio);
+            ps.setObject(3, fim);
+        }, (rs, rowNum) -> mapearPedido(rs));
+    }
+
     private Pedido mapearPedido(ResultSet rs) throws SQLException {
         long id = rs.getLong("id");
         String clienteCpf = rs.getString("cliente_cpf");
@@ -106,6 +128,7 @@ public class PedidoRepositoryJDBC implements PedidoRepository {
         double impostos = rs.getDouble("impostos");
         double desconto = rs.getDouble("desconto");
         double valorCobrado = rs.getDouble("valor_cobrado");
+        java.time.LocalDateTime dataCriacao = rs.getTimestamp("data_criacao").toLocalDateTime();
 
         // Recuperar itens do pedido
         String sqlItens = "SELECT produto_id, quantidade FROM pedido_itens WHERE pedido_id = ?";
@@ -126,6 +149,6 @@ public class PedidoRepositoryJDBC implements PedidoRepository {
             cliente = new Cliente("N/A", "N/A", "N/A", "N/A", "N/A", "N/A");
         }
 
-        return new Pedido(id, cliente, itens, status, valor, impostos, desconto, valorCobrado);
+        return new Pedido(id, cliente, itens, status, valor, impostos, desconto, valorCobrado, dataCriacao);
     }
 }

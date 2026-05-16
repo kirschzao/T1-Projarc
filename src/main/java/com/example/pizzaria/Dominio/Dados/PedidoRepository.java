@@ -7,4 +7,6 @@ public interface PedidoRepository {
     Pedido recuperarPorId(long id);
     void atualizar(Pedido pedido);
     int contarPedidosPorClienteNoPeriodo(String cpf, int dias);
+    java.util.List<Pedido> recuperarEntreguesPorData(java.time.LocalDateTime inicio, java.time.LocalDateTime fim);
+    java.util.List<Pedido> recuperarEntreguesPorClienteEData(String cpf, java.time.LocalDateTime inicio, java.time.LocalDateTime fim);
 }
