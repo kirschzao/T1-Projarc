@@ -35,7 +35,7 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/docs", "/v3/api-docs/**", "/h2/**").permitAll()
+                .requestMatchers("/docs", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/h2/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/auth/registrar").permitAll()
                 .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/pedidos/submeter").authenticated()
