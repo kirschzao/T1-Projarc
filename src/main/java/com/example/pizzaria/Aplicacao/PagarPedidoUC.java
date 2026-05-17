@@ -27,11 +27,12 @@ public class PagarPedidoUC {
 
         if (pedido.getStatus() != Pedido.Status.APROVADO) {
             throw new RegraDeNegocioException(
-                "Cancelamento negado. Pedido não está em estado APROVADO. Estado atual: " + pedido.getStatus().name());
+                    "Cancelamento negado. Pedido não está em estado APROVADO. Estado atual: "
+                            + pedido.getStatus().name());
         }
 
         boolean pagamentoRealizado = pagamentoService.processarPagamento(pedidoId, pedido.getValorCobrado());
-        
+
         if (!pagamentoRealizado) {
             throw new RegraDeNegocioException("Pagamento recusado.");
         }
@@ -39,9 +40,9 @@ public class PagarPedidoUC {
         pedido.setStatus(Pedido.Status.PAGO);
         pedidoService.atualizar(pedido);
 
-        // O pagamento do pedido implica que ele é encaminhado para a cozinha para ser elaborado
         cozinhaService.chegadaDePedido(pedido);
 
-        return new PagarPedidoResponse(pedidoId, true, "Pedido pago com sucesso e encaminhado para a cozinha.", pedido.getStatus().name());
+        return new PagarPedidoResponse(pedidoId, true, "Pedido pago com sucesso e encaminhado para a cozinha.",
+                pedido.getStatus().name());
     }
 }
