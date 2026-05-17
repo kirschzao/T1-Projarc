@@ -10,7 +10,7 @@ import com.example.pizzaria.Dominio.Dados.IngredientesRepository;
 import com.example.pizzaria.Dominio.Entidades.Ingrediente;
 
 @Repository
-public class IngredientesRepositoryJDBC implements IngredientesRepository{
+public class IngredientesRepositoryJDBC implements IngredientesRepository {
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -23,7 +23,7 @@ public class IngredientesRepositoryJDBC implements IngredientesRepository{
         List<Ingrediente> ingredientes = this.jdbcTemplate.query(
                 sql,
                 ps -> {
-                }, // Sem parâmetros
+                },
                 (rs, rowNum) -> new Ingrediente(rs.getLong("id"), rs.getString("descricao")));
         return ingredientes;
     }

@@ -82,7 +82,7 @@ public class PedidoService {
         );
 
         Pedido pedido = new Pedido(0, clienteComEndereco, itens, Pedido.Status.NOVO,
-            valorTotal, imposto, desconto, valorCobrado);
+            valorTotal, imposto, desconto, valorCobrado, java.time.LocalDateTime.now());
 
         return pedidoRepository.salvar(pedido);
     }
@@ -125,7 +125,7 @@ public class PedidoService {
         Pedido pedidoCancelado = new Pedido(
             pedido.getId(), pedido.getCliente(), pedido.getItens(),
             Pedido.Status.CANCELADO, pedido.getValor(), pedido.getImpostos(),
-            pedido.getDesconto(), pedido.getValorCobrado()
+            pedido.getDesconto(), pedido.getValorCobrado(), pedido.getDataCriacao()
         );
         pedidoRepository.atualizar(pedidoCancelado);
     }

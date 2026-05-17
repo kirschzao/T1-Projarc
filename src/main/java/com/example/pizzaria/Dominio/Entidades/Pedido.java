@@ -1,6 +1,7 @@
 package com.example.pizzaria.Dominio.Entidades;
 
 import java.util.List;
+import java.time.LocalDateTime;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -46,6 +47,8 @@ public class Pedido {
     @PositiveOrZero
     private double valorCobrado;
 
+    @NotNull
+    private LocalDateTime dataCriacao;
     
     public void setStatus(Status status){
         this.status = status;

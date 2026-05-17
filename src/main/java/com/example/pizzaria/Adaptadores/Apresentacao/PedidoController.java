@@ -8,12 +8,22 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.format.annotation.DateTimeFormat;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import com.example.pizzaria.Aplicacao.CancelarPedidoUC;
 import com.example.pizzaria.Aplicacao.ConsultarStatusPedidoUC;
+import com.example.pizzaria.Aplicacao.ListarPedidosClienteEntreguesUC;
+import com.example.pizzaria.Aplicacao.ListarPedidosEntreguesUC;
+import com.example.pizzaria.Aplicacao.PagarPedidoUC;
 import com.example.pizzaria.Aplicacao.Requests.CancelarPedidoRequest;
 import com.example.pizzaria.Aplicacao.Requests.StatusPedidoRequest;
 import com.example.pizzaria.Aplicacao.Requests.SubmeterPedidoRequest;
 import com.example.pizzaria.Aplicacao.Responses.CancelarPedidoResponse;
+import com.example.pizzaria.Aplicacao.Responses.ListagemPedidoResponse;
+import com.example.pizzaria.Aplicacao.Responses.PagarPedidoResponse;
 import com.example.pizzaria.Aplicacao.Responses.PedidoResponse;
 import com.example.pizzaria.Aplicacao.Responses.StatusPedidoResponse;
 import com.example.pizzaria.Aplicacao.SubmeterPedidoUC;
@@ -32,6 +42,9 @@ public class PedidoController {
     private final SubmeterPedidoUC submeterPedidoUC;
     private final ConsultarStatusPedidoUC consultarStatusPedidoUC;
     private final CancelarPedidoUC cancelarPedidoUC;
+    private final PagarPedidoUC pagarPedidoUC;
+    private final ListarPedidosEntreguesUC listarPedidosEntreguesUC;
+    private final ListarPedidosClienteEntreguesUC listarPedidosClienteEntreguesUC;
 
     @PostMapping("/submeter")
     @Operation(
@@ -66,5 +79,38 @@ public class PedidoController {
     ) {
         long pedidoId = request != null ? request.pedidoId() : id;
         return cancelarPedidoUC.run(pedidoId);
+    }
+
+    @PostMapping("/{id}/pagar")
+    @Operation(
+        summary = "Pagar pedido (UC7)",
+        description = "Permite ao cliente autenticado pagar um pedido em estado APROVADO. O pedido será encaminhado para a cozinha."
+    )
+    public PagarPedidoResponse pagarPedido(@PathVariable long id) {
+        return pagarPedidoUC.run(id);
+    }
+
+    @GetMapping("/entregues")
+    @Operation(
+        summary = "Listar os pedidos entregues entre duas datas (UC8)",
+        description = "Retorna todos os pedidos que estão no status ENTREGUE dentro do intervalo de datas especificado."
+    )
+    public List<ListagemPedidoResponse> listarPedidosEntregues(
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim
+    ) {
+        return listarPedidosEntreguesUC.run(inicio, fim);
+    }
+
+    @GetMapping("/entregues/meus")
+    @Operation(
+        summary = "Listar os pedidos de um determinado cliente entregues entre duas datas (UC9)",
+        description = "Retorna os pedidos do cliente autenticado que estão no status ENTREGUE dentro do intervalo de datas especificado."
+    )
+    public List<ListagemPedidoResponse> listarMeusPedidosEntregues(
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim
+    ) {
+        return listarPedidosClienteEntreguesUC.run(inicio, fim);
     }
 }
