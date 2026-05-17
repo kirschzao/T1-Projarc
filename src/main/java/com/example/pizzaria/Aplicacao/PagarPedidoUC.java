@@ -27,7 +27,7 @@ public class PagarPedidoUC {
 
         if (pedido.getStatus() != Pedido.Status.APROVADO) {
             throw new RegraDeNegocioException(
-                    "Cancelamento negado. Pedido não está em estado APROVADO. Estado atual: "
+                    "Pagamento negado. Pedido não está em estado APROVADO. Estado atual: "
                             + pedido.getStatus().name());
         }
 
