@@ -8,10 +8,10 @@ import org.springframework.stereotype.Service;
 
 import com.example.pizzaria.Dominio.Dados.PedidoRepository;
 import com.example.pizzaria.Dominio.Entidades.Pedido;
-import com.example.pizzaria.Dominio.Servicos.EntregaService;
+import com.example.pizzaria.Dominio.Servicos.IEntregaService;
 
 @Service
-public class EntregaServiceFake implements EntregaService {
+public class EntregaServiceFake implements IEntregaService {
 
     private final PedidoRepository pedidoRepository;
     private final ScheduledExecutorService scheduler;

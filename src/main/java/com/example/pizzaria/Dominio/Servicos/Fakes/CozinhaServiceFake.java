@@ -10,11 +10,11 @@ import org.springframework.stereotype.Service;
 
 import com.example.pizzaria.Dominio.Dados.PedidoRepository;
 import com.example.pizzaria.Dominio.Entidades.Pedido;
-import com.example.pizzaria.Dominio.Servicos.CozinhaService;
-import com.example.pizzaria.Dominio.Servicos.EntregaService;
+import com.example.pizzaria.Dominio.Servicos.ICozinhaService;
+import com.example.pizzaria.Dominio.Servicos.IEntregaService;
 
 @Service
-public class CozinhaServiceFake implements CozinhaService {
+public class CozinhaServiceFake implements ICozinhaService {
     private final Queue<Pedido> filaEntrada;
     private Pedido emPreparacao;
     private final Queue<Pedido> filaSaida;
@@ -22,9 +22,9 @@ public class CozinhaServiceFake implements CozinhaService {
     private final ScheduledExecutorService scheduler;
 
     private final PedidoRepository pedidoRepository;
-    private final EntregaService entregaService;
+    private final IEntregaService entregaService;
 
-    public CozinhaServiceFake(PedidoRepository pedidoRepository, EntregaService entregaService) {
+    public CozinhaServiceFake(PedidoRepository pedidoRepository, IEntregaService entregaService) {
         this.filaEntrada = new LinkedBlockingQueue<Pedido>();
         this.emPreparacao = null;
         this.filaSaida = new LinkedBlockingQueue<Pedido>();

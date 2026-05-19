@@ -25,7 +25,7 @@ public class PedidoService {
 
     private final PedidoRepository pedidoRepository;
     private final ProdutoService produtoService;
-    private final EstoqueService estoqueService;
+    private final IEstoqueService estoqueService;
     private final ImpostoService impostoService;
     private final DescontoService descontoService;
 
@@ -59,11 +59,11 @@ public class PedidoService {
 
         if (!itensIndisponiveis.isEmpty()) {
             String nomes = itensDoPedido.stream()
-                .map(ItemPedido::getItem)
-                .filter(p -> itensIndisponiveis.contains(p.getId()))
-                .map(Produto::getDescricao)
-                .distinct()
-                .collect(Collectors.joining(", "));
+                    .map(ItemPedido::getItem)
+                    .filter(p -> itensIndisponiveis.contains(p.getId()))
+                    .map(Produto::getDescricao)
+                    .distinct()
+                    .collect(Collectors.joining(", "));
             throw new RegraDeNegocioException("Pedido contém itens indisponíveis no cardápio: " + nomes + ".");
         }
 
@@ -77,12 +77,11 @@ public class PedidoService {
         double valorCobrado = (valorTotal - desconto) + imposto;
 
         Cliente clienteComEndereco = new Cliente(
-            cliente.getCpf(), cliente.getNome(), cliente.getCelular(),
-            enderecoEntrega, cliente.getEmail(), cliente.getSenha()
-        );
+                cliente.getCpf(), cliente.getNome(), cliente.getCelular(),
+                enderecoEntrega, cliente.getEmail(), cliente.getSenha());
 
         Pedido pedido = new Pedido(0, clienteComEndereco, itens, Pedido.Status.NOVO,
-            valorTotal, imposto, desconto, valorCobrado, java.time.LocalDateTime.now());
+                valorTotal, imposto, desconto, valorCobrado, java.time.LocalDateTime.now());
 
         return pedidoRepository.salvar(pedido);
     }
@@ -95,15 +94,16 @@ public class PedidoService {
             }
 
             String nomes = itens.stream()
-                .map(ItemPedido::getItem)
-                .filter(p -> indisponiveis.contains(p.getId()))
-                .map(Produto::getDescricao)
-                .distinct()
-                .collect(Collectors.joining(", "));
+                    .map(ItemPedido::getItem)
+                    .filter(p -> indisponiveis.contains(p.getId()))
+                    .map(Produto::getDescricao)
+                    .distinct()
+                    .collect(Collectors.joining(", "));
 
             return nomes.isBlank()
-                ? "Estoque insuficiente para um ou mais ingredientes."
-                : "Estoque insuficiente. Itens não atendidos: " + nomes + ". Itens foram marcados como indisponíveis.";
+                    ? "Estoque insuficiente para um ou mais ingredientes."
+                    : "Estoque insuficiente. Itens não atendidos: " + nomes
+                            + ". Itens foram marcados como indisponíveis.";
         }
 
         pedido.setStatus(Pedido.Status.APROVADO);
@@ -120,19 +120,19 @@ public class PedidoService {
     public void cancelar(Pedido pedido) {
         if (pedido.getStatus() != Pedido.Status.APROVADO) {
             throw new RegraDeNegocioException(
-                "Cancelamento negado. Pedido não está em estado APROVADO. Estado atual: " + pedido.getStatus().name());
+                    "Cancelamento negado. Pedido não está em estado APROVADO. Estado atual: "
+                            + pedido.getStatus().name());
         }
         Pedido pedidoCancelado = new Pedido(
-            pedido.getId(), pedido.getCliente(), pedido.getItens(),
-            Pedido.Status.CANCELADO, pedido.getValor(), pedido.getImpostos(),
-            pedido.getDesconto(), pedido.getValorCobrado(), pedido.getDataCriacao()
-        );
+                pedido.getId(), pedido.getCliente(), pedido.getItens(),
+                Pedido.Status.CANCELADO, pedido.getValor(), pedido.getImpostos(),
+                pedido.getDesconto(), pedido.getValorCobrado(), pedido.getDataCriacao());
         pedidoRepository.atualizar(pedidoCancelado);
     }
 
     private double calcularValorTotal(List<ItemPedido> itens) {
         return itens.stream()
-            .mapToDouble(item -> item.getItem().getPreco() * item.getQuantidade())
-            .sum();
+                .mapToDouble(item -> item.getItem().getPreco() * item.getQuantidade())
+                .sum();
     }
 }
