@@ -2,12 +2,12 @@
 -- CLIENTES
 -- Senha para todos: 123456 (criptografada com BCrypt)
 -- ============================================================
-INSERT INTO clientes (cpf, nome, celular, endereco, email, senha) VALUES ('9001', 'Huguinho Pato', '51985744566', 'Rua das Flores, 100', 'huguinho.pato@email.com', '$2a$10$slYQmyNdGzin7olVN3p5OPST9/PgBkqquzi8Ss7KIUgO2t0jWMUga');
-INSERT INTO clientes (cpf, nome, celular, endereco, email, senha) VALUES ('9002', 'Luizinho Pato', '51991720790', 'Av. Central, 200', 'zezinho.pato@email.com', '$2a$10$slYQmyNdGzin7olVN3p5OPST9/PgBkqquzi8Ss7KIUgO2t0jWMUga');
-INSERT INTO clientes (cpf, nome, celular, endereco, email, senha) VALUES ('9003', 'Zezinho Pato', '51993456789', 'Rua Ipiranga, 350', 'luizinho.pato@email.com', '$2a$10$slYQmyNdGzin7olVN3p5OPST9/PgBkqquzi8Ss7KIUgO2t0jWMUga');
-INSERT INTO clientes (cpf, nome, celular, endereco, email, senha) VALUES ('9004', 'Tio Patinhas', '51998765432', 'Caixa Forte, 1', 'patinhas@email.com', '$2a$10$slYQmyNdGzin7olVN3p5OPST9/PgBkqquzi8Ss7KIUgO2t0jWMUga');
-INSERT INTO clientes (cpf, nome, celular, endereco, email, senha) VALUES ('9005', 'Donald Pato', '51991234567', 'Rua dos Marrecos, 42', 'donald.pato@email.com', '$2a$10$slYQmyNdGzin7olVN3p5OPST9/PgBkqquzi8Ss7KIUgO2t0jWMUga');
-INSERT INTO clientes (cpf, nome, celular, endereco, email, senha) VALUES ('9006', 'Margarida Pato', '51994567890', 'Av. das Flores, 88', 'margarida@email.com', '$2a$10$slYQmyNdGzin7olVN3p5OPST9/PgBkqquzi8Ss7KIUgO2t0jWMUga');
+INSERT INTO clientes (cpf, nome, celular, endereco, email, senha) VALUES ('9001', 'Huguinho Pato', '51985744566', 'Rua das Flores, 100', 'huguinho.pato@email.com', '$2a$10$khY6KgjSCr2KsbfzbASDUOF4PMfTqJOAqYgJbakzqRd7ZZgSGP1Q6');
+INSERT INTO clientes (cpf, nome, celular, endereco, email, senha) VALUES ('9002', 'Luizinho Pato', '51991720790', 'Av. Central, 200', 'zezinho.pato@email.com', '$2a$10$khY6KgjSCr2KsbfzbASDUOF4PMfTqJOAqYgJbakzqRd7ZZgSGP1Q6');
+INSERT INTO clientes (cpf, nome, celular, endereco, email, senha) VALUES ('9003', 'Zezinho Pato', '51993456789', 'Rua Ipiranga, 350', 'luizinho.pato@email.com', '$2a$10$khY6KgjSCr2KsbfzbASDUOF4PMfTqJOAqYgJbakzqRd7ZZgSGP1Q6');
+INSERT INTO clientes (cpf, nome, celular, endereco, email, senha) VALUES ('9004', 'Tio Patinhas', '51998765432', 'Caixa Forte, 1', 'patinhas@email.com', '$2a$10$khY6KgjSCr2KsbfzbASDUOF4PMfTqJOAqYgJbakzqRd7ZZgSGP1Q6');
+INSERT INTO clientes (cpf, nome, celular, endereco, email, senha) VALUES ('9005', 'Donald Pato', '51991234567', 'Rua dos Marrecos, 42', 'donald.pato@email.com', '$2a$10$khY6KgjSCr2KsbfzbASDUOF4PMfTqJOAqYgJbakzqRd7ZZgSGP1Q6');
+INSERT INTO clientes (cpf, nome, celular, endereco, email, senha) VALUES ('9006', 'Margarida Pato', '51994567890', 'Av. das Flores, 88', 'margarida@email.com', '$2a$10$khY6KgjSCr2KsbfzbASDUOF4PMfTqJOAqYgJbakzqRd7ZZgSGP1Q6');
 
 -- ============================================================
 -- INGREDIENTES

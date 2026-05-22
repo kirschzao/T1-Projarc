@@ -39,7 +39,7 @@ public class PedidoRepositoryJDBC implements PedidoRepository {
         
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(conn -> {
-            var ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            var ps = conn.prepareStatement(sql, new String[]{"id"});
             ps.setString(1, pedido.getCliente().getCpf());
             ps.setString(2, pedido.getStatus().name());
             ps.setDouble(3, pedido.getValor());
