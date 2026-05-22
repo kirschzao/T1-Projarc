@@ -13,12 +13,12 @@ import com.example.pizzaria.Dominio.Entidades.Cardapio;
 import com.example.pizzaria.Dominio.Entidades.Produto;
 
 @Component
-public class CardapioRepositoryJDBC implements CardapioRepository{
+public class CardapioRepositoryJDBC implements CardapioRepository {
     private final JdbcTemplate jdbcTemplate;
     private final ProdutosRepository produtosRepository;
 
     @Autowired
-    public CardapioRepositoryJDBC(JdbcTemplate jdbcTemplate,ProdutosRepository  produtosRepository){
+    public CardapioRepositoryJDBC(JdbcTemplate jdbcTemplate, ProdutosRepository produtosRepository) {
         this.jdbcTemplate = jdbcTemplate;
         this.produtosRepository = produtosRepository;
     }
@@ -27,10 +27,9 @@ public class CardapioRepositoryJDBC implements CardapioRepository{
     public Cardapio recuperaPorId(long id) {
         String sql = "SELECT id, titulo FROM cardapios WHERE id = ?";
         List<Cardapio> cardapios = this.jdbcTemplate.query(
-            sql,
-            ps -> ps.setLong(1, id),
-            (rs, rowNum) -> new Cardapio(new CabecalhoCardapio(rs.getLong("id"), rs.getString("titulo")), null)
-        );
+                sql,
+                ps -> ps.setLong(1, id),
+                (rs, rowNum) -> new Cardapio(new CabecalhoCardapio(rs.getLong("id"), rs.getString("titulo")), null));
         if (cardapios.isEmpty()) {
             return null;
         }
@@ -41,20 +40,19 @@ public class CardapioRepositoryJDBC implements CardapioRepository{
     }
 
     @Override
-    // Por enquanto retorna sempre a pizza de queijo e presunto como indicação do "chef"
     public List<Produto> indicacoesDoChef() {
-        return List.of(produtosRepository.recuperaProdutoPorid(2L));   
+        return List.of(produtosRepository.recuperaProdutoPorid(2L));
     }
 
     @Override
-    public List<CabecalhoCardapio> cardapiosDisponiveis(){
+    public List<CabecalhoCardapio> cardapiosDisponiveis() {
         String sql = "SELECT id, titulo FROM cardapios";
         List<CabecalhoCardapio> cabCardapios = this.jdbcTemplate.query(
-            sql,
-            ps->{},
-            (rs, rowNum) -> new CabecalhoCardapio(rs.getLong("id"), rs.getString("titulo"))
-        );
+                sql,
+                ps -> {
+                },
+                (rs, rowNum) -> new CabecalhoCardapio(rs.getLong("id"), rs.getString("titulo")));
         return cabCardapios;
     }
-    
+
 }

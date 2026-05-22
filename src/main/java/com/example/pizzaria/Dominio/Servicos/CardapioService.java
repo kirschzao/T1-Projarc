@@ -43,7 +43,8 @@ public class CardapioService {
     public void setCardapioCorrenteId(long id) {
         Cardapio cardapio = cardapioRepository.recuperaPorId(id);
         if (cardapio == null) {
-            throw new RecursoNaoEncontradoException("Cardápio ID " + id + " não encontrado. Não é possível definir como corrente.");
+            throw new RecursoNaoEncontradoException(
+                    "Cardápio ID " + id + " não encontrado. Não é possível definir como corrente.");
         }
         this.cardapioCorrenteId = id;
     }

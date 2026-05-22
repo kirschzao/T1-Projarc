@@ -1,5 +1,5 @@
 package com.example.pizzaria.Dominio.Servicos;
 
-public interface PagamentoService {
+public interface IPagamentoService {
     boolean processarPagamento(long pedidoId, double valor);
 }
