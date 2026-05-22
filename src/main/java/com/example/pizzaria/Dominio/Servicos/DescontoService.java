@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class DescontoService {
+public class DescontoService implements IDescontoService {
 
     private final PedidoRepository pedidoRepository;
     private final ClienteService clienteService;
@@ -17,7 +17,7 @@ public class DescontoService {
         String cpf = clienteService.recuperarPorEmail(emailCliente).getCpf();
         int pedidosRecentes = pedidoRepository.contarPedidosPorClienteNoPeriodo(cpf, 20);
 
-        if (pedidosRecentes >= 3) {
+        if (pedidosRecentes > 3) {
             return valorTotal * 0.07;
         }
         return 0.0;

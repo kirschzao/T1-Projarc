@@ -26,8 +26,8 @@ public class PedidoService {
     private final PedidoRepository pedidoRepository;
     private final ProdutoService produtoService;
     private final IEstoqueService estoqueService;
-    private final ImpostoService impostoService;
-    private final DescontoService descontoService;
+    private final IImpostoService impostoService;
+    private final IDescontoService descontoService;
 
     public Pedido salvar(Pedido pedido) {
         return pedidoRepository.salvar(pedido);
