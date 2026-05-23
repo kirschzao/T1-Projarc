@@ -44,6 +44,8 @@ public class CozinhaServiceFake implements ICozinhaService {
 
     @Override
     public synchronized void chegadaDePedido(Pedido p) {
+        p.setStatus(Pedido.Status.AGUARDANDO);
+        pedidoRepository.atualizar(p);
         filaEntrada.add(p);
         if (emPreparacao == null) {
             colocaEmPreparacao(filaEntrada.poll());

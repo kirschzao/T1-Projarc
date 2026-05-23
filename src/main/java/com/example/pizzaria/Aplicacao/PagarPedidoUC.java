@@ -6,8 +6,8 @@ import org.springframework.stereotype.Component;
 import com.example.pizzaria.Aplicacao.Responses.PagarPedidoResponse;
 import com.example.pizzaria.Dominio.Entidades.Pedido;
 import com.example.pizzaria.Dominio.Exceptions.RegraDeNegocioException;
-import com.example.pizzaria.Dominio.Servicos.CozinhaService;
-import com.example.pizzaria.Dominio.Servicos.PagamentoService;
+import com.example.pizzaria.Dominio.Servicos.ICozinhaService;
+import com.example.pizzaria.Dominio.Servicos.IPagamentoService;
 import com.example.pizzaria.Dominio.Servicos.PedidoService;
 
 import lombok.RequiredArgsConstructor;
@@ -16,8 +16,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PagarPedidoUC {
     private final PedidoService pedidoService;
-    private final PagamentoService pagamentoService;
-    private final CozinhaService cozinhaService;
+    private final IPagamentoService pagamentoService;
+    private final ICozinhaService cozinhaService;
 
     public PagarPedidoResponse run(long pedidoId) {
         String emailAutenticado = SecurityContextHolder.getContext().getAuthentication().getName();
