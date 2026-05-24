@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.example.pizzaria.Aplicacao.Responses.ListagemPedidoResponse;
@@ -21,10 +20,8 @@ public class ListarPedidosClienteEntreguesUC {
     private final PedidoRepository pedidoRepository;
     private final ClienteRepository clienteRepository;
 
-    public List<ListagemPedidoResponse> run(LocalDateTime inicio, LocalDateTime fim) {
-        String emailAutenticado = SecurityContextHolder.getContext().getAuthentication().getName();
-        
-        Cliente cliente = clienteRepository.recuperarPorEmail(emailAutenticado);
+    public List<ListagemPedidoResponse> run(String cpfCliente, LocalDateTime inicio, LocalDateTime fim) {
+        Cliente cliente = clienteRepository.recuperarPorCpf(cpfCliente);
         if (cliente == null) {
             throw new RecursoNaoEncontradoException("Cliente não encontrado.");
         }

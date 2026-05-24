@@ -12,6 +12,6 @@ public record AutenticarClienteRequest(
     String email,
 
     @NotBlank
-    @Schema(description = "Senha do cliente", example = "senha123")
+    @Schema(description = "Senha do cliente", example = "123456")
     String senha
 ) {}

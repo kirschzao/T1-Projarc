@@ -102,15 +102,16 @@ public class PedidoController {
         return listarPedidosEntreguesUC.run(inicio, fim);
     }
 
-    @GetMapping("/entregues/meus")
+    @GetMapping("/entregues/{id}")
     @Operation(
         summary = "Listar os pedidos de um determinado cliente entregues entre duas datas (UC9)",
         description = "Retorna os pedidos do cliente autenticado que estão no status ENTREGUE dentro do intervalo de datas especificado."
     )
     public List<ListagemPedidoResponse> listarMeusPedidosEntregues(
+        @PathVariable String id,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim
     ) {
-        return listarPedidosClienteEntreguesUC.run(inicio, fim);
+        return listarPedidosClienteEntreguesUC.run(id, inicio, fim);
     }
 }
