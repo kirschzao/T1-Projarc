@@ -19,7 +19,7 @@ Este repositório contém a implementação do backend para o sistema de gestão
 
 ---
 
-## ⚙️ Pré-requisitos
+## ⚙️ Pré-requisitos:
 
 Antes de iniciar, certifique-se de ter instalado em sua máquina:
 
@@ -31,7 +31,7 @@ Antes de iniciar, certifique-se de ter instalado em sua máquina:
 
 ## 🚀 Como Bootar a aplicação
 
-### 1. Configuração do Banco de Dados
+### 1. Configuração do Banco de Dados:
 
 Antes de rodar a aplicação, você precisa criar o banco de dados no PostgreSQL.
 Abra o seu terminal do Postgres (psql) ou sua ferramenta visual (pgAdmin, DBeaver) e execute:
@@ -52,7 +52,7 @@ spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 ```
 
-### 2. Executando o Projeto
+### 2. Executando o Projeto:
 
 Você pode inicializar a aplicação diretamente pela sua IDE (rodando a classe principal `Application.java`) ou utilizando o Maven Wrapper pelo terminal.
 
