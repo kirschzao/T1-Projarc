@@ -10,7 +10,7 @@ Este repositório contém a implementação do backend para o sistema de gestão
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## 🛠️ Tecnologias Utilizadas:
 
 - **Java 17+** \* **Spring Boot 3.x** (Web, Security, Data JPA, Validation)
 - **PostgreSQL** (Banco de dados relacional)
