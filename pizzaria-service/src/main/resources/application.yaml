@@ -1,30 +1,26 @@
 spring:
+  application:
+    name: pizzaria-service
   datasource:
-    url: jdbc:h2:mem:pizzadb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/pizzadb
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USER:pizzaria}
+    password: ${DB_PASSWORD:pizzaria123}
   sql:
     init:
-      mode: always # executa schema.sql no boot
-    schema-locations: classpath:schema.sql
-    data-locations: classpath:data.sql
-  h2:
-    console:
-      enabled: true
-      path: /h2
-  security:
-    user:
-      name: admin
-      password: admin
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+
+server:
+  port: 8081
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+
 logging:
   level:
-    org:
-      springframework:
-        jdbc: DEBUG
-    com:
-      pizzadb: DEBUG
-application:
-  name: ex4-lancheriaddd-v1
-server:
-  port: 8080
+    org.springframework.jdbc: DEBUG
+    com.pizzadb: DEBUG
