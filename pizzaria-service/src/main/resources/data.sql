@@ -189,28 +189,28 @@ INSERT INTO cardapio_produto (cardapio_id, produto_id) VALUES (3, 10);
 -- PEDIDOS HISTORICOS (para testar UC5, UC8, UC9 e descontos)
 -- ============================================================
 -- Huguinho: 5 pedidos entregues (elegivel para desconto: > 3 nos ultimos 20 dias)
-INSERT INTO pedidos (cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao) VALUES ('9001', 'ENTREGUE', 11000, 1100, 0, 12100, DATEADD('DAY', -18, CURRENT_TIMESTAMP));
-INSERT INTO pedidos (cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao) VALUES ('9001', 'ENTREGUE', 6000, 600, 0, 6600, DATEADD('DAY', -15, CURRENT_TIMESTAMP));
-INSERT INTO pedidos (cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao) VALUES ('9001', 'ENTREGUE', 5500, 550, 0, 6050, DATEADD('DAY', -10, CURRENT_TIMESTAMP));
-INSERT INTO pedidos (cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao) VALUES ('9001', 'ENTREGUE', 12500, 1250, 875, 12875, DATEADD('DAY', -5, CURRENT_TIMESTAMP));
-INSERT INTO pedidos (cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao) VALUES ('9001', 'ENTREGUE', 4000, 400, 280, 4120, DATEADD('DAY', -2, CURRENT_TIMESTAMP));
+INSERT INTO pedidos (cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao) VALUES ('9001', 'ENTREGUE', 11000, 1100, 0, 12100, CURRENT_TIMESTAMP - INTERVAL '18 days');
+INSERT INTO pedidos (cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao) VALUES ('9001', 'ENTREGUE', 6000, 600, 0, 6600, CURRENT_TIMESTAMP - INTERVAL '15 days');
+INSERT INTO pedidos (cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao) VALUES ('9001', 'ENTREGUE', 5500, 550, 0, 6050, CURRENT_TIMESTAMP - INTERVAL '10 days');
+INSERT INTO pedidos (cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao) VALUES ('9001', 'ENTREGUE', 12500, 1250, 875, 12875, CURRENT_TIMESTAMP - INTERVAL '5 days');
+INSERT INTO pedidos (cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao) VALUES ('9001', 'ENTREGUE', 4000, 400, 280, 4120, CURRENT_TIMESTAMP - INTERVAL '2 days');
 
 -- Luizinho: 2 pedidos entregues + 1 aprovado (sem desconto)
-INSERT INTO pedidos (cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao) VALUES ('9002', 'ENTREGUE', 5500, 550, 0, 6050, DATEADD('DAY', -12, CURRENT_TIMESTAMP));
-INSERT INTO pedidos (cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao) VALUES ('9002', 'ENTREGUE', 6200, 620, 0, 6820, DATEADD('DAY', -7, CURRENT_TIMESTAMP));
-INSERT INTO pedidos (cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao) VALUES ('9002', 'APROVADO', 10000, 1000, 0, 11000, DATEADD('DAY', -1, CURRENT_TIMESTAMP));
+INSERT INTO pedidos (cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao) VALUES ('9002', 'ENTREGUE', 5500, 550, 0, 6050, CURRENT_TIMESTAMP - INTERVAL '12 days');
+INSERT INTO pedidos (cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao) VALUES ('9002', 'ENTREGUE', 6200, 620, 0, 6820, CURRENT_TIMESTAMP - INTERVAL '7 days');
+INSERT INTO pedidos (cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao) VALUES ('9002', 'APROVADO', 10000, 1000, 0, 11000, CURRENT_TIMESTAMP - INTERVAL '1 days');
 
 -- Zezinho: 1 pedido entregue + 1 cancelado
-INSERT INTO pedidos (cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao) VALUES ('9003', 'ENTREGUE', 7000, 700, 0, 7700, DATEADD('DAY', -8, CURRENT_TIMESTAMP));
-INSERT INTO pedidos (cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao) VALUES ('9003', 'CANCELADO', 5800, 580, 0, 6380, DATEADD('DAY', -3, CURRENT_TIMESTAMP));
+INSERT INTO pedidos (cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao) VALUES ('9003', 'ENTREGUE', 7000, 700, 0, 7700, CURRENT_TIMESTAMP - INTERVAL '8 days');
+INSERT INTO pedidos (cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao) VALUES ('9003', 'CANCELADO', 5800, 580, 0, 6380, CURRENT_TIMESTAMP - INTERVAL '3 days');
 
 -- Tio Patinhas: 3 pedidos entregues (exatamente 3, NAO elegivel para desconto pois precisa de mais de 3)
-INSERT INTO pedidos (cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao) VALUES ('9004', 'ENTREGUE', 6500, 650, 0, 7150, DATEADD('DAY', -14, CURRENT_TIMESTAMP));
-INSERT INTO pedidos (cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao) VALUES ('9004', 'ENTREGUE', 5700, 570, 0, 6270, DATEADD('DAY', -9, CURRENT_TIMESTAMP));
-INSERT INTO pedidos (cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao) VALUES ('9004', 'ENTREGUE', 11500, 1150, 0, 12650, DATEADD('DAY', -4, CURRENT_TIMESTAMP));
+INSERT INTO pedidos (cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao) VALUES ('9004', 'ENTREGUE', 6500, 650, 0, 7150, CURRENT_TIMESTAMP - INTERVAL '14 days');
+INSERT INTO pedidos (cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao) VALUES ('9004', 'ENTREGUE', 5700, 570, 0, 6270, CURRENT_TIMESTAMP - INTERVAL '9 days');
+INSERT INTO pedidos (cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao) VALUES ('9004', 'ENTREGUE', 11500, 1150, 0, 12650, CURRENT_TIMESTAMP - INTERVAL '4 days');
 
 -- Donald: 1 pedido entregue antigo (fora dos 20 dias)
-INSERT INTO pedidos (cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao) VALUES ('9005', 'ENTREGUE', 4000, 400, 0, 4400, DATEADD('DAY', -30, CURRENT_TIMESTAMP));
+INSERT INTO pedidos (cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao) VALUES ('9005', 'ENTREGUE', 4000, 400, 0, 4400, CURRENT_TIMESTAMP - INTERVAL '30 days');
 
 -- Margarida: sem pedidos (cliente novo)
 

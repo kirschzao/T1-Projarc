@@ -94,8 +94,8 @@ public class PedidoRepositoryJDBC implements PedidoRepository {
 
     @Override
     public int contarPedidosPorClienteNoPeriodo(String cpf, int dias) {
-        String sql = "SELECT COUNT(*) FROM pedidos WHERE cliente_cpf = ? AND data_criacao >= DATEADD('DAY', ?, CURRENT_TIMESTAMP)";
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, cpf, -dias);
+        String sql = "SELECT COUNT(*) FROM pedidos WHERE cliente_cpf = ? AND data_criacao >= CURRENT_TIMESTAMP - CAST(? || ' days' AS INTERVAL)";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, cpf, dias);
         return count != null ? count : 0;
     }
 
