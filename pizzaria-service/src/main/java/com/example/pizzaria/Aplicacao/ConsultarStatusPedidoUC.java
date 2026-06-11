@@ -1,6 +1,5 @@
 package com.example.pizzaria.Aplicacao;
 
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.example.pizzaria.Aplicacao.Responses.StatusPedidoResponse;
@@ -14,9 +13,7 @@ import lombok.RequiredArgsConstructor;
 public class ConsultarStatusPedidoUC {
     private final PedidoService pedidoService;
 
-    public StatusPedidoResponse run(long pedidoId) {
-        String emailAutenticado = SecurityContextHolder.getContext().getAuthentication().getName();
-
+    public StatusPedidoResponse run(String emailAutenticado, long pedidoId) {
         Pedido pedido = pedidoService.recuperarPorId(pedidoId);
         pedidoService.validarPropriedade(pedido, emailAutenticado);
 

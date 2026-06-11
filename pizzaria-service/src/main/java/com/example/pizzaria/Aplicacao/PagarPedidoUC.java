@@ -1,6 +1,5 @@
 package com.example.pizzaria.Aplicacao;
 
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.example.pizzaria.Aplicacao.Responses.PagarPedidoResponse;
@@ -19,9 +18,7 @@ public class PagarPedidoUC {
     private final IPagamentoService pagamentoService;
     private final ICozinhaService cozinhaService;
 
-    public PagarPedidoResponse run(long pedidoId) {
-        String emailAutenticado = SecurityContextHolder.getContext().getAuthentication().getName();
-
+    public PagarPedidoResponse run(String emailAutenticado, long pedidoId) {
         Pedido pedido = pedidoService.recuperarPorId(pedidoId);
         pedidoService.validarPropriedade(pedido, emailAutenticado);
 

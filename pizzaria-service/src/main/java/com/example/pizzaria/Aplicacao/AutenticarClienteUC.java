@@ -1,8 +1,6 @@
 package com.example.pizzaria.Aplicacao;
 
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.example.pizzaria.Aplicacao.Requests.AutenticarClienteRequest;
@@ -16,19 +14,21 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 public class AutenticarClienteUC {
-    private final AuthenticationManager authenticationManager;
     private final ClienteService clienteService;
+    private final PasswordEncoder passwordEncoder;
 
     public AutenticarClienteResponse run(AutenticarClienteRequest request) {
-        try {
-            authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.email(), request.senha())
-            );
-        } catch (AuthenticationException e) {
+        Cliente cliente = clienteService.recuperarPorEmail(request.email());
+
+        if (!passwordEncoder.matches(request.senha(), cliente.getSenha())) {
             throw new RegraDeNegocioException("Email ou senha inválidos.");
         }
 
-        Cliente cliente = clienteService.recuperarPorEmail(request.email());
-        return new AutenticarClienteResponse(true, "Autenticação realizada com sucesso.", cliente.getNome(), cliente.getEmail());
+        return new AutenticarClienteResponse(
+            true,
+            "Autenticação realizada com sucesso.",
+            cliente.getNome(),
+            cliente.getEmail()
+        );
     }
 }
