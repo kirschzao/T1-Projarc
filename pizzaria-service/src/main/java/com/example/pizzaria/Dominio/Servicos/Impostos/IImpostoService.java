@@ -1,6 +1,6 @@
 package com.example.pizzaria.Dominio.Servicos.Impostos;
 
-public interface IImpostoStrategy {
+public interface IImpostoService {
     String getCodigo();
     double calcularImposto(double valorTotal);
 }

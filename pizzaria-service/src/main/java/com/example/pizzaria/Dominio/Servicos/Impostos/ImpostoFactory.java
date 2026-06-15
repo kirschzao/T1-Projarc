@@ -10,13 +10,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class ImpostoFactory {
 
-    private final Map<String, IImpostoStrategy> estrategias;
+    private final Map<String, IImpostoService> estrategias;
     private final String leiAtiva;
 
-    public ImpostoFactory(List<IImpostoStrategy> strategies,
+    public ImpostoFactory(List<IImpostoService> strategies,
                           @Value("${imposto.lei:Lei12345}") String leiAtiva) {
         this.estrategias = strategies.stream()
-                .collect(Collectors.toMap(IImpostoStrategy::getCodigo, s -> s));
+                .collect(Collectors.toMap(IImpostoService::getCodigo, s -> s));
         this.leiAtiva = leiAtiva;
 
         if (!this.estrategias.containsKey(leiAtiva)) {
@@ -25,7 +25,7 @@ public class ImpostoFactory {
         }
     }
 
-    public IImpostoStrategy getAtivo() {
+    public IImpostoService getAtivo() {
         return estrategias.get(leiAtiva);
     }
 

@@ -1,9 +1,9 @@
 package com.example.pizzaria.Dominio.Servicos.Impostos;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
-public class ImpostoLei67890 implements IImpostoStrategy {
+@Service
+public class ImpostoLei67890 implements IImpostoService {
     @Override
     public String getCodigo() {
         return "Lei67890";

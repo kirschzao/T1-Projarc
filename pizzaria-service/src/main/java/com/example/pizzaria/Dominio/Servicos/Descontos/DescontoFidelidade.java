@@ -1,15 +1,15 @@
 package com.example.pizzaria.Dominio.Servicos.Descontos;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.example.pizzaria.Dominio.Dados.PedidoRepository;
 import com.example.pizzaria.Dominio.Servicos.ClienteService;
 
 import lombok.RequiredArgsConstructor;
 
-@Component
+@Service
 @RequiredArgsConstructor
-public class DescontoFidelidade implements IDescontoStrategy {
+public class DescontoFidelidade implements IDescontoService {
 
     private final PedidoRepository pedidoRepository;
     private final ClienteService clienteService;

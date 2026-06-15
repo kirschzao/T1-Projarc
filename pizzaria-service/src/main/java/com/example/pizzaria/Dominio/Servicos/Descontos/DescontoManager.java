@@ -9,16 +9,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class DescontoManager {
 
-    private final Map<String, IDescontoStrategy> estrategias;
+    private final Map<String, IDescontoService> estrategias;
     private String codigoAtivo;
 
-    public DescontoManager(List<IDescontoStrategy> strategies) {
+    public DescontoManager(List<IDescontoService> strategies) {
         this.estrategias = strategies.stream()
-                .collect(Collectors.toMap(IDescontoStrategy::getCodigo, s -> s));
+                .collect(Collectors.toMap(IDescontoService::getCodigo, s -> s));
         this.codigoAtivo = "Fidelidade";
     }
 
-    public IDescontoStrategy getAtivo() {
+    public IDescontoService getAtivo() {
         return estrategias.get(codigoAtivo);
     }
 
@@ -34,9 +34,7 @@ public class DescontoManager {
         return codigoAtivo;
     }
 
-    public List<Map<String, String>> listarDisponiveis() {
-        return estrategias.values().stream()
-                .map(s -> Map.of("codigo", s.getCodigo(), "descricao", s.getDescricao()))
-                .toList();
+    public List<IDescontoService> listarDisponiveis() {
+        return List.copyOf(estrategias.values());
     }
 }
