@@ -16,6 +16,8 @@ import com.example.pizzaria.Dominio.Entidades.Produto;
 import com.example.pizzaria.Dominio.Exceptions.AcessoNegadoException;
 import com.example.pizzaria.Dominio.Exceptions.RecursoNaoEncontradoException;
 import com.example.pizzaria.Dominio.Exceptions.RegraDeNegocioException;
+import com.example.pizzaria.Dominio.Servicos.Impostos.ImpostoFactory;
+import com.example.pizzaria.Dominio.Servicos.Descontos.DescontoManager;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,8 +28,8 @@ public class PedidoService {
     private final PedidoRepository pedidoRepository;
     private final ProdutoService produtoService;
     private final IEstoqueService estoqueService;
-    private final IImpostoService impostoService;
-    private final IDescontoService descontoService;
+    private final ImpostoFactory impostoFactory;
+    private final DescontoManager descontoManager;
 
     public Pedido salvar(Pedido pedido) {
         return pedidoRepository.salvar(pedido);
@@ -72,8 +74,8 @@ public class PedidoService {
 
     public Pedido criarPedido(Cliente cliente, List<ItemPedido> itens, String enderecoEntrega) {
         double valorTotal = calcularValorTotal(itens);
-        double desconto = descontoService.calcularDesconto(cliente.getEmail(), valorTotal);
-        double imposto = impostoService.calcularImposto(valorTotal);
+        double desconto = descontoManager.getAtivo().calcularDesconto(cliente.getEmail(), valorTotal);
+        double imposto = impostoFactory.getAtivo().calcularImposto(valorTotal);
         double valorCobrado = (valorTotal - desconto) + imposto;
 
         Cliente clienteComEndereco = new Cliente(

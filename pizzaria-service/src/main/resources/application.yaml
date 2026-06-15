@@ -20,6 +20,9 @@ eureka:
     service-url:
       defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
 
+imposto:
+  lei: ${IMPOSTO_LEI:Lei12345}
+
 logging:
   level:
     org.springframework.jdbc: DEBUG

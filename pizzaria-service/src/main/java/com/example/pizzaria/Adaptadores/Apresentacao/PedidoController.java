@@ -26,11 +26,14 @@ import com.example.pizzaria.Aplicacao.Responses.PedidoResponse;
 import com.example.pizzaria.Aplicacao.Responses.StatusPedidoResponse;
 import com.example.pizzaria.Aplicacao.SubmeterPedidoUC;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/pedidos")
 @RequiredArgsConstructor
+@Tag(name = "Pedidos", description = "Operações de criação, pagamento, cancelamento e consulta de pedidos")
 public class PedidoController {
 
     private final SubmeterPedidoUC submeterPedidoUC;
@@ -41,6 +44,7 @@ public class PedidoController {
     private final ListarPedidosClienteEntreguesUC listarPedidosClienteEntreguesUC;
 
     @PostMapping("/submeter")
+    @Operation(summary = "Submeter pedido para aprovação (UC6)", description = "Cliente submete um pedido com lista de itens para aprovação. Retorna o pedido aprovado com preço calculado ou negado por falta de ingredientes.")
     public PedidoResponse submeterPedido(
             @RequestHeader("X-User-Email") String emailAutenticado,
             @RequestBody SubmeterPedidoRequest request) {
@@ -48,6 +52,7 @@ public class PedidoController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Consultar status do pedido (UC7)", description = "Cliente consulta o status atual de seu pedido pelo ID.")
     public StatusPedidoResponse consultarStatusPedido(
             @RequestHeader("X-User-Email") String emailAutenticado,
             @PathVariable long id) {
@@ -55,6 +60,7 @@ public class PedidoController {
     }
 
     @PostMapping("/{id}/cancelar")
+    @Operation(summary = "Cancelar pedido (UC8)", description = "Cliente cancela um pedido aprovado mas ainda não pago.")
     public CancelarPedidoResponse cancelarPedido(
             @RequestHeader("X-User-Email") String emailAutenticado,
             @PathVariable long id) {
@@ -62,6 +68,7 @@ public class PedidoController {
     }
 
     @PostMapping("/{id}/pagar")
+    @Operation(summary = "Pagar pedido (UC9)", description = "Cliente efetua o pagamento de um pedido aprovado, encaminhando-o para a cozinha.")
     public PagarPedidoResponse pagarPedido(
             @RequestHeader("X-User-Email") String emailAutenticado,
             @PathVariable long id) {
@@ -69,6 +76,7 @@ public class PedidoController {
     }
 
     @GetMapping("/entregues")
+    @Operation(summary = "Listar pedidos entregues entre duas datas (UC10)", description = "Retorna todos os pedidos entregues no intervalo de datas informado.")
     public List<ListagemPedidoResponse> listarPedidosEntregues(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim) {
@@ -76,6 +84,7 @@ public class PedidoController {
     }
 
     @GetMapping("/entregues/meus")
+    @Operation(summary = "Listar meus pedidos entregues entre duas datas", description = "Retorna os pedidos entregues do cliente autenticado no intervalo de datas informado.")
     public List<ListagemPedidoResponse> listarMeusPedidosEntregues(
             @RequestHeader("X-User-Email") String emailAutenticado,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
