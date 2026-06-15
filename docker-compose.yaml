@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: pizzadb
+      POSTGRES_USER: pizzaria
+      POSTGRES_PASSWORD: pizzaria123
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pizzaria -d pizzadb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  eureka-server:
+    build: ./eureka-server
+    ports:
+      - "8761:8761"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8761/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  pizzaria-service:
+    build: ./pizzaria-service
+    environment:
+      DB_HOST: postgres
+      DB_USER: pizzaria
+      DB_PASSWORD: pizzaria123
+      EUREKA_URI: http://eureka-server:8761/eureka
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      EUREKA_URI: http://eureka-server:8761/eureka
+      JWT_SECRET: minha-chave-secreta-super-segura-para-jwt-256-bits!!
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+
+volumes:
+  pgdata:

@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: pizzaria-service
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/pizzadb
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USER:pizzaria}
+    password: ${DB_PASSWORD:pizzaria123}
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+
+server:
+  port: 8081
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+
+logging:
+  level:
+    org.springframework.jdbc: DEBUG
+    com.pizzadb: DEBUG
