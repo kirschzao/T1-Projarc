@@ -31,6 +31,7 @@ services:
       DB_USER: pizzaria
       DB_PASSWORD: pizzaria123
       EUREKA_URI: http://eureka-server:8761/eureka
+      IMPOSTO_LEI: Lei12345
     depends_on:
       postgres:
         condition: service_healthy
