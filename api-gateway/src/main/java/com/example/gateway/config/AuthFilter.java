@@ -24,6 +24,17 @@ public class AuthFilter implements GlobalFilter, Ordered {
         "/eureka"
     );
 
+    private static final List<String> ADMIN_PUT_PATHS = List.of(
+        "/api/cardapio/corrente/",
+        "/api/descontos/corrente/"
+    );
+
+    private static final List<String> ADMIN_GET_PATHS = List.of(
+        "/api/cardapio/lista",
+        "/api/descontos/lista",
+        "/api/descontos/corrente"
+    );
+
     public AuthFilter(JwtUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
     }
@@ -51,9 +62,16 @@ public class AuthFilter implements GlobalFilter, Ordered {
         }
 
         String email = jwtUtil.extractEmail(token);
+        String role = jwtUtil.extractRole(token);
+
+        if (isAdminPath(path, exchange.getRequest().getMethod().name()) && !"ADMIN".equals(role)) {
+            exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+            return exchange.getResponse().setComplete();
+        }
 
         ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
                 .header("X-User-Email", email)
+                .header("X-User-Role", role)
                 .build();
 
         return chain.filter(exchange.mutate().request(mutatedRequest).build());
@@ -61,6 +79,16 @@ public class AuthFilter implements GlobalFilter, Ordered {
 
     private boolean isPublicPath(String path) {
         return PUBLIC_PATHS.stream().anyMatch(path::startsWith);
+    }
+
+    private boolean isAdminPath(String path, String method) {
+        if ("PUT".equals(method) && ADMIN_PUT_PATHS.stream().anyMatch(path::startsWith)) {
+            return true;
+        }
+        if ("GET".equals(method) && ADMIN_GET_PATHS.stream().anyMatch(path::startsWith)) {
+            return true;
+        }
+        return false;
     }
 
     @Override

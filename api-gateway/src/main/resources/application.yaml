@@ -10,6 +10,12 @@ spring:
             - Path=/api/**
           filters:
             - StripPrefix=1
+        - id: estoque-service
+          uri: lb://estoque-service
+          predicates:
+            - Path=/api-estoque/**
+          filters:
+            - StripPrefix=1
 
 server:
   port: 8080

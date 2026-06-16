@@ -41,8 +41,8 @@ public class AuthController {
                     response -> Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Email ou senha inválidos.")))
                 .bodyToMono(ValidarResponse.class)
                 .map(validar -> {
-                    String token = jwtUtil.generateToken(validar.email());
-                    return new LoginResponse(true, "Login realizado com sucesso.", validar.nome(), validar.email(), token);
+                    String token = jwtUtil.generateToken(validar.email(), validar.role());
+                    return new LoginResponse(true, "Login realizado com sucesso.", validar.nome(), validar.email(), validar.role(), token);
                 });
     }
 
