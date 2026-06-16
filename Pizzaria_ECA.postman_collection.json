@@ -1,0 +1,611 @@
+{
+	"info": {
+		"_postman_id": "a90b4d45-7f99-4621-a5c2-12759e6659c9",
+		"name": "Pizzaria ECA - Test Suite",
+		"description": "Suíte de testes completa e isolada para as Use Cases (UC1 a UC9) e rotas acessórias da Pizzaria ECA. Inclui autenticação básica integrada e separação de contextos por cliente para evitar erros de Acesso Negado.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "01. Autenticação e Registro",
+			"item": [
+				{
+					"name": "UC1 - Registrar Novo Cliente",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"cpf\": \"9007\",\n  \"nome\": \"Peninha Pato\",\n  \"celular\": \"51999999999\",\n  \"endereco\": \"Rua da Patolândia, 500\",\n  \"email\": \"peninha@email.com\",\n  \"senha\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/registrar",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"registrar"
+							]
+						},
+						"description": "Registra um novo cliente no sistema. Após registrar, você pode alterar a variável `authEmail` da coleção para `peninha@email.com` para realizar as requisições protegidas com esta conta."
+					},
+					"response": []
+				},
+				{
+					"name": "UC2 - Autenticar Cliente (Login)",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"huguinho.pato@email.com\",\n  \"senha\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Autentica um cliente existente na base (neste exemplo, Huguinho Pato). Retorna se o login foi bem sucedido e os detalhes do usuário."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "02. Cardápio",
+			"item": [
+				{
+					"name": "UC3 - Carregar Cardápio Corrente",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/cardapio/corrente",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"cardapio",
+								"corrente"
+							]
+						},
+						"description": "Retorna o cardápio definido atualmente como padrão do sistema (por padrão inicial, ID 1), com todos os itens disponíveis e marcando quais são as sugestões do chef vigentes."
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Todos os Cardápios",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/cardapio/lista",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"cardapio",
+								"lista"
+							]
+						},
+						"description": "Retorna a listagem de todos os cardápios cadastrados na pizzaria (Clássico, Gourmet, Promocional, etc) com seus respectivos IDs e títulos."
+					},
+					"response": []
+				},
+				{
+					"name": "Carregar Cardápio por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/cardapio/2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"cardapio",
+								"2"
+							]
+						},
+						"description": "Carrega as informações e itens de um cardápio específico via seu ID (no exemplo, o ID 2 representa o Cardápio Gourmet)."
+					},
+					"response": []
+				},
+				{
+					"name": "Definir Cardápio Corrente",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/cardapio/corrente/2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"cardapio",
+								"corrente",
+								"2"
+							]
+						},
+						"description": "Define qual cardápio passa a ser o corrente no sistema (no exemplo, definimos o cardápio ID 2 como corrente). Após essa chamada, o endpoint `/cardapio/corrente` passará a retornar a lista Gourmet."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "03. Gestão de Pedidos",
+			"item": [
+				{
+					"name": "A. Fluxo Huguinho (Fidelidade)",
+					"item": [
+						{
+							"name": "UC4 - Submeter Pedido (Com Desconto)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const response = pm.response.json();",
+											"if (response && response.pedidoId) {",
+											"    pm.collectionVariables.set(\"last_pedido_huguinho_id\", response.pedidoId);",
+											"    console.log(\"Variável 'last_pedido_huguinho_id' atualizada para:\", response.pedidoId);",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"enderecoEntrega\": \"Rua das Flores, 100\",\n  \"itens\": [\n    {\n      \"produtoId\": 1,\n      \"quantidade\": 1\n    },\n    {\n      \"produtoId\": 9,\n      \"quantidade\": 1\n    }\n  ]\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/pedidos/submeter",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"pedidos",
+										"submeter"
+									]
+								},
+								"description": "Submete um pedido sob o cliente Huguinho Pato. Como Huguinho tem mais de 3 pedidos entregues, ele ganha desconto automaticamente. Utilizamos os produtos 1 e 9 que possuem receitas e estão 100% funcionais."
+							},
+							"response": []
+						},
+						{
+							"name": "UC5 - Consultar Status do Pedido",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/pedidos/{{last_pedido_huguinho_id}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"pedidos",
+										"{{last_pedido_huguinho_id}}"
+									]
+								},
+								"description": "Consulta o status do pedido de Huguinho usando as credenciais dele (herdado da coleção)."
+							},
+							"response": []
+						},
+						{
+							"name": "UC7 - Pagar Pedido",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/pedidos/{{last_pedido_huguinho_id}}/pagar",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"pedidos",
+										"{{last_pedido_huguinho_id}}",
+										"pagar"
+									]
+								},
+								"description": "Realiza o pagamento do pedido de Huguinho usando as credenciais dele. O pedido mudará de APROVADO para PAGO."
+							},
+							"response": []
+						},
+						{
+							"name": "UC6 - Cancelar Pedido",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/pedidos/{{last_pedido_huguinho_id}}/cancelar",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"pedidos",
+										"{{last_pedido_huguinho_id}}",
+										"cancelar"
+									]
+								},
+								"description": "Cancela o pedido do Huguinho (só funciona se estiver APROVADO e antes do pagamento)."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "B. Fluxo Margarida (Cliente Novo)",
+					"item": [
+						{
+							"name": "UC4.1 - Submeter Pedido (Sem Desconto)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const response = pm.response.json();",
+											"if (response && response.pedidoId) {",
+											"    pm.collectionVariables.set(\"last_pedido_margarida_id\", response.pedidoId);",
+											"    console.log(\"Variável 'last_pedido_margarida_id' atualizada para:\", response.pedidoId);",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "password",
+											"value": "123456",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "margarida@email.com",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"enderecoEntrega\": \"Av. das Flores, 88\",\n  \"itens\": [\n    {\n      \"produtoId\": 2,\n      \"quantidade\": 1\n    }\n  ]\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/pedidos/submeter",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"pedidos",
+										"submeter"
+									]
+								},
+								"description": "Submete o pedido para a Margarida Pato usando explicitamente as credenciais dela. Margarida não recebe descontos pois não tem histórico de compras."
+							},
+							"response": []
+						},
+						{
+							"name": "UC5.2 - Consultar Status do Pedido",
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "password",
+											"value": "123456",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "margarida@email.com",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/pedidos/{{last_pedido_margarida_id}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"pedidos",
+										"{{last_pedido_margarida_id}}"
+									]
+								},
+								"description": "Consulta o status do pedido de Margarida usando as credenciais explícitas dela."
+							},
+							"response": []
+						},
+						{
+							"name": "UC6.1 - Cancelar Pedido",
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "password",
+											"value": "123456",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "margarida@email.com",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/pedidos/{{last_pedido_margarida_id}}/cancelar",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"pedidos",
+										"{{last_pedido_margarida_id}}",
+										"cancelar"
+									]
+								},
+								"description": "Cancela o pedido de Margarida usando as credenciais explícitas dela."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "C. Histórico e Outros",
+					"item": [
+						{
+							"name": "UC5.1 - Consultar Status de Pedido Histórico (Luizinho)",
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "password",
+											"value": "123456",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "zezinho.pato@email.com",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/pedidos/8",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"pedidos",
+										"8"
+							]
+								},
+								"description": "Consulta o pedido ID 8 (pré-populado no data.sql). Como ele pertence ao CPF 9002 (Luizinho Pato, cujo e-mail cadastrado no seed é zezinho.pato@email.com), passamos explicitamente a autenticação dele para não haver 403."
+							},
+							"response": []
+						},
+						{
+							"name": "UC8 - Listar Pedidos Entregues (Período Geral)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/pedidos/entregues?inicio=2026-05-01T00:00:00&fim=2026-05-31T23:59:59",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"pedidos",
+										"entregues"
+									],
+									"query": [
+										{
+											"key": "inicio",
+											"value": "2026-05-01T00:00:00"
+										},
+										{
+											"key": "fim",
+											"value": "2026-05-31T23:59:59"
+										}
+									]
+								},
+								"description": "Retorna todos os pedidos de todos os clientes que estão no status `ENTREGUE` no período de datas selecionado (maio de 2026)."
+							},
+							"response": []
+						},
+						{
+							"name": "UC9 - Listar Meus Pedidos Entregues",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/pedidos/entregues/meus?inicio=2026-05-01T00:00:00&fim=2026-05-31T23:59:59",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"pedidos",
+										"entregues",
+										"meus"
+									],
+									"query": [
+										{
+											"key": "inicio",
+											"value": "2026-05-01T00:00:00"
+										},
+										{
+											"key": "fim",
+											"value": "2026-05-31T23:59:59"
+										}
+									]
+								},
+								"description": "Retorna a listagem dos pedidos que pertencem estritamente ao cliente atualmente logado no cabeçalho Basic Auth (`authEmail`) e que foram concluídos/entregues no período definido."
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "04. Utilidades",
+			"item": [
+				{
+					"name": "Visualizar Docs do Scalar",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/docs",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"docs"
+							]
+						},
+						"description": "Carrega a interface interativa gerada pelo Scalar com a especificação da API."
+					},
+					"response": []
+				},
+				{
+					"name": "Boas Vindas (Health Check)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								""
+							]
+						},
+						"description": "Endpoint básico para verificação de funcionamento e integridade da aplicação."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "authEmail",
+			"value": "huguinho.pato@email.com",
+			"type": "string"
+		},
+		{
+			"key": "authPassword",
+			"value": "123456",
+			"type": "string"
+		},
+		{
+			"key": "last_pedido_huguinho_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "last_pedido_margarida_id",
+			"value": "2",
+			"type": "string"
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "{{authPassword}}",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "{{authEmail}}",
+				"type": "string"
+			}
+		]
+	}
+}
