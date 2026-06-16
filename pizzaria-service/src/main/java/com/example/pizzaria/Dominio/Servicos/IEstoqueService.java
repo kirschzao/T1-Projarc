@@ -8,4 +8,6 @@ public interface IEstoqueService {
     boolean verificaDisponibilidade(List<ItemPedido> itens);
 
     List<Long> identificarProdutosIndisponiveis(List<ItemPedido> itensDoPedido);
+
+    void darBaixa(List<ItemPedido> itens);
 }

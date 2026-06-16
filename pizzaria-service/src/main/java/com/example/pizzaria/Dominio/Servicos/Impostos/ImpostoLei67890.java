@@ -11,7 +11,7 @@ public class ImpostoLei67890 implements IImpostoService {
 
     @Override
     public double calcularImposto(double valorTotal) {
-        if (valorTotal <= 100.0) {
+        if (valorTotal <= 10000) {
             return valorTotal * 0.08;
         }
         return valorTotal * 0.12;

@@ -13,6 +13,34 @@ services:
       timeout: 5s
       retries: 10
 
+  estoque-db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: estoquedb
+      POSTGRES_USER: estoque
+      POSTGRES_PASSWORD: estoque123
+    volumes:
+      - estoque_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U estoque -d estoquedb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
   eureka-server:
     build: ./eureka-server
     ports:
@@ -24,6 +52,19 @@ services:
       retries: 10
       start_period: 30s
 
+  estoque-service:
+    build: ./estoque-service
+    environment:
+      DB_HOST: estoque-db
+      DB_USER: estoque
+      DB_PASSWORD: estoque123
+      EUREKA_URI: http://eureka-server:8761/eureka
+    depends_on:
+      estoque-db:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+
   pizzaria-service:
     build: ./pizzaria-service
     environment:
@@ -32,11 +73,33 @@ services:
       DB_PASSWORD: pizzaria123
       EUREKA_URI: http://eureka-server:8761/eureka
       IMPOSTO_LEI: Lei12345
+      RABBITMQ_HOST: rabbitmq
     depends_on:
       postgres:
         condition: service_healthy
       eureka-server:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      estoque-service:
+        condition: service_started
+
+  entrega-service:
+    build: ./entrega-service
+    environment:
+      EUREKA_URI: http://eureka-server:8761/eureka
+      RABBITMQ_HOST: rabbitmq
+    ports:
+      - "8083"
+    deploy:
+      replicas: 3
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      pizzaria-service:
+        condition: service_started
 
   api-gateway:
     build: ./api-gateway
@@ -51,3 +114,4 @@ services:
 
 volumes:
   pgdata:
+  estoque_pgdata:
