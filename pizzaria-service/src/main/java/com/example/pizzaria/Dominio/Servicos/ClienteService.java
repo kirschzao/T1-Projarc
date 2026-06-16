@@ -46,7 +46,7 @@ public class ClienteService {
             throw new RegraDeNegocioException("Já existe um cliente registrado com este email.");
         }
         String senhaCriptografada = passwordEncoder.encode(senha);
-        Cliente novoCliente = new Cliente(cpf, nome, celular, endereco, email, senhaCriptografada);
+        Cliente novoCliente = new Cliente(cpf, nome, celular, endereco, email, senhaCriptografada, "CLIENTE");
         clienteRepository.salvar(novoCliente);
         return novoCliente;
     }

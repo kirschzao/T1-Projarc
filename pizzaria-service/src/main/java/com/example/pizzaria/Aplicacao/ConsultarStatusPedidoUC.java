@@ -17,6 +17,9 @@ public class ConsultarStatusPedidoUC {
         Pedido pedido = pedidoService.recuperarPorId(pedidoId);
         pedidoService.validarPropriedade(pedido, emailAutenticado);
 
-        return new StatusPedidoResponse(pedidoId, pedido.getStatus().name(), "Status do pedido consultado com sucesso.", true);
+        var historico = pedidoService.recuperarHistoricoStatus(pedidoId);
+
+        return new StatusPedidoResponse(pedidoId, pedido.getStatus().name(),
+                "Status do pedido consultado com sucesso.", true, historico);
     }
 }

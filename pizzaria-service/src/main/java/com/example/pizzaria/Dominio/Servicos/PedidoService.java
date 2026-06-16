@@ -80,7 +80,7 @@ public class PedidoService {
 
         Cliente clienteComEndereco = new Cliente(
                 cliente.getCpf(), cliente.getNome(), cliente.getCelular(),
-                enderecoEntrega, cliente.getEmail(), cliente.getSenha());
+                enderecoEntrega, cliente.getEmail(), cliente.getSenha(), cliente.getRole());
 
         Pedido pedido = new Pedido(0, clienteComEndereco, itens, Pedido.Status.NOVO,
                 valorTotal, imposto, desconto, valorCobrado, java.time.LocalDateTime.now());
@@ -108,6 +108,9 @@ public class PedidoService {
                             + ". Itens foram marcados como indisponíveis.";
         }
 
+        // Dar baixa no estoque
+        estoqueService.darBaixa(itens);
+
         pedido.setStatus(Pedido.Status.APROVADO);
         pedidoRepository.atualizar(pedido);
         return null;
@@ -130,6 +133,10 @@ public class PedidoService {
                 Pedido.Status.CANCELADO, pedido.getValor(), pedido.getImpostos(),
                 pedido.getDesconto(), pedido.getValorCobrado(), pedido.getDataCriacao());
         pedidoRepository.atualizar(pedidoCancelado);
+    }
+
+    public java.util.List<java.util.Map<String, Object>> recuperarHistoricoStatus(long pedidoId) {
+        return pedidoRepository.recuperarHistoricoStatus(pedidoId);
     }
 
     private double calcularValorTotal(List<ItemPedido> itens) {

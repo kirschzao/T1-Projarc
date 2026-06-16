@@ -16,7 +16,7 @@ public class DescontoPromocaoDiaDosPais implements IDescontoService {
 
     @Override
     public double calcularDesconto(String emailCliente, double valorTotal) {
-        if (valorTotal > 80.0) {
+        if (valorTotal > 8000) {
             return valorTotal * 0.15;
         }
         return 0.0;

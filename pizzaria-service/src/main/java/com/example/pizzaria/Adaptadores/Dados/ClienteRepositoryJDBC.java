@@ -20,7 +20,7 @@ public class ClienteRepositoryJDBC implements ClienteRepository {
 
     @Override
     public Cliente recuperarPorCpf(String cpf) {
-        String sql = "SELECT cpf, nome, celular, endereco, email, senha FROM clientes WHERE cpf = ?";
+        String sql = "SELECT cpf, nome, celular, endereco, email, senha, role FROM clientes WHERE cpf = ?";
         List<Cliente> clientes = jdbcTemplate.query(sql,
             ps -> ps.setString(1, cpf),
             (rs, rowNum) -> new Cliente(
@@ -29,7 +29,8 @@ public class ClienteRepositoryJDBC implements ClienteRepository {
                 rs.getString("celular"),
                 rs.getString("endereco"),
                 rs.getString("email"),
-                rs.getString("senha")
+                rs.getString("senha"),
+                rs.getString("role")
             )
         );
         return clientes.isEmpty() ? null : clientes.getFirst();
@@ -37,7 +38,7 @@ public class ClienteRepositoryJDBC implements ClienteRepository {
 
     @Override
     public Cliente recuperarPorEmail(String email) {
-        String sql = "SELECT cpf, nome, celular, endereco, email, senha FROM clientes WHERE email = ?";
+        String sql = "SELECT cpf, nome, celular, endereco, email, senha, role FROM clientes WHERE email = ?";
         List<Cliente> clientes = jdbcTemplate.query(sql,
             ps -> ps.setString(1, email),
             (rs, rowNum) -> new Cliente(
@@ -46,7 +47,8 @@ public class ClienteRepositoryJDBC implements ClienteRepository {
                 rs.getString("celular"),
                 rs.getString("endereco"),
                 rs.getString("email"),
-                rs.getString("senha")
+                rs.getString("senha"),
+                rs.getString("role")
             )
         );
         return clientes.isEmpty() ? null : clientes.getFirst();
@@ -54,14 +56,15 @@ public class ClienteRepositoryJDBC implements ClienteRepository {
 
     @Override
     public void salvar(Cliente cliente) {
-        String sql = "INSERT INTO clientes (cpf, nome, celular, endereco, email, senha) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO clientes (cpf, nome, celular, endereco, email, senha, role) VALUES (?, ?, ?, ?, ?, ?, ?)";
         jdbcTemplate.update(sql,
             cliente.getCpf(),
             cliente.getNome(),
             cliente.getCelular(),
             cliente.getEndereco(),
             cliente.getEmail(),
-            cliente.getSenha()
+            cliente.getSenha(),
+            cliente.getRole()
         );
     }
 }

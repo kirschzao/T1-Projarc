@@ -2,6 +2,7 @@ package com.example.pizzaria.Dominio.Servicos;
 
 import java.util.List;
 
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import com.example.pizzaria.Dominio.Dados.CardapioRepository;
@@ -17,8 +18,7 @@ import lombok.RequiredArgsConstructor;
 public class CardapioService {
 
     private final CardapioRepository cardapioRepository;
-
-    private long cardapioCorrenteId = 1L;
+    private final JdbcTemplate jdbcTemplate;
 
     public Cardapio recuperaCardapio(long id) {
         Cardapio cardapio = cardapioRepository.recuperaPorId(id);
@@ -37,7 +37,9 @@ public class CardapioService {
     }
 
     public long getCardapioCorrenteId() {
-        return cardapioCorrenteId;
+        String valor = jdbcTemplate.queryForObject(
+            "SELECT valor FROM configuracoes WHERE chave = 'cardapio_corrente_id'", String.class);
+        return Long.parseLong(valor);
     }
 
     public void setCardapioCorrenteId(long id) {
@@ -46,6 +48,7 @@ public class CardapioService {
             throw new RecursoNaoEncontradoException(
                     "Cardápio ID " + id + " não encontrado. Não é possível definir como corrente.");
         }
-        this.cardapioCorrenteId = id;
+        jdbcTemplate.update("UPDATE configuracoes SET valor = ? WHERE chave = 'cardapio_corrente_id'",
+            String.valueOf(id));
     }
 }

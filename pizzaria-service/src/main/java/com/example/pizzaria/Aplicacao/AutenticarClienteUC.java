@@ -28,7 +28,8 @@ public class AutenticarClienteUC {
             true,
             "Autenticação realizada com sucesso.",
             cliente.getNome(),
-            cliente.getEmail()
+            cliente.getEmail(),
+            cliente.getRole()
         );
     }
 }

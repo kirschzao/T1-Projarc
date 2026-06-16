@@ -4,19 +4,18 @@ CREATE TABLE IF NOT EXISTS clientes(
   celular VARCHAR(20) NOT NULL,
   endereco VARCHAR(255) NOT NULL,
   email VARCHAR(255) NOT NULL,
-  senha VARCHAR(255) NOT NULL
+  senha VARCHAR(255) NOT NULL,
+  role VARCHAR(20) NOT NULL DEFAULT 'CLIENTE'
+);
+
+CREATE TABLE IF NOT EXISTS configuracoes(
+  chave VARCHAR(50) NOT NULL PRIMARY KEY,
+  valor VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS ingredientes (
   id BIGINT PRIMARY KEY,
   descricao VARCHAR(255) NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS itensEstoque(
-    id BIGINT PRIMARY KEY,
-    quantidade INT,
-    ingrediente_id BIGINT,
-    FOREIGN KEY (ingrediente_id) REFERENCES ingredientes(id)
 );
 
 CREATE TABLE IF NOT EXISTS receitas (
@@ -79,4 +78,12 @@ CREATE TABLE IF NOT EXISTS pedido_itens (
   quantidade INT NOT NULL,
   FOREIGN KEY (pedido_id) REFERENCES pedidos(id),
   FOREIGN KEY (produto_id) REFERENCES produtos(id)
+);
+
+CREATE TABLE IF NOT EXISTS pedido_historico_status (
+  id BIGSERIAL PRIMARY KEY,
+  pedido_id BIGINT NOT NULL,
+  status VARCHAR(50) NOT NULL,
+  data_hora TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (pedido_id) REFERENCES pedidos(id)
 );

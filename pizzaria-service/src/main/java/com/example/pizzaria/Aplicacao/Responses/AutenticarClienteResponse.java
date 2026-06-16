@@ -14,5 +14,8 @@ public record AutenticarClienteResponse(
     String nome,
 
     @Schema(description = "Email do cliente autenticado", example = "joao.silva@email.com")
-    String email
+    String email,
+
+    @Schema(description = "Role do usuário", example = "CLIENTE")
+    String role
 ) {}

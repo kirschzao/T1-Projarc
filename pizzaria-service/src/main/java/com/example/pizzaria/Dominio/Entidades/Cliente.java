@@ -24,4 +24,7 @@ public class Cliente {
 
     @NotBlank
     private String senha;
+
+    @NotBlank
+    private String role;
 }

@@ -57,6 +57,9 @@ public class PedidoRepositoryJDBC implements PedidoRepository {
             jdbcTemplate.update(sqlItem, novoId, item.getItem().getId(), item.getQuantidade());
         }
 
+        // Registrar status inicial no histórico
+        registrarHistoricoStatus(novoId, pedido.getStatus().name());
+
         // Retornar o pedido com o novo ID
         return new Pedido(
             novoId,
@@ -85,11 +88,25 @@ public class PedidoRepositoryJDBC implements PedidoRepository {
     @Override
     public void atualizar(Pedido pedido) {
         String sql = "UPDATE pedidos SET status = ? WHERE id = ?";
-        
+
         jdbcTemplate.update(sql,
             pedido.getStatus().name(),
             pedido.getId()
         );
+
+        // Registrar mudança de status no histórico
+        registrarHistoricoStatus(pedido.getId(), pedido.getStatus().name());
+    }
+
+    private void registrarHistoricoStatus(long pedidoId, String status) {
+        String sql = "INSERT INTO pedido_historico_status (pedido_id, status) VALUES (?, ?)";
+        jdbcTemplate.update(sql, pedidoId, status);
+    }
+
+    @Override
+    public java.util.List<java.util.Map<String, Object>> recuperarHistoricoStatus(long pedidoId) {
+        String sql = "SELECT status, data_hora FROM pedido_historico_status WHERE pedido_id = ? ORDER BY data_hora";
+        return jdbcTemplate.queryForList(sql, pedidoId);
     }
 
     @Override
@@ -101,8 +118,10 @@ public class PedidoRepositoryJDBC implements PedidoRepository {
 
     @Override
     public List<Pedido> recuperarEntreguesPorData(java.time.LocalDateTime inicio, java.time.LocalDateTime fim) {
-        String sql = "SELECT id, cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao " +
-                     "FROM pedidos WHERE status = 'ENTREGUE' AND data_criacao BETWEEN ? AND ?";
+        String sql = "SELECT p.id, p.cliente_cpf, p.status, p.valor, p.impostos, p.desconto, p.valor_cobrado, p.data_criacao " +
+                     "FROM pedidos p " +
+                     "JOIN pedido_historico_status h ON h.pedido_id = p.id " +
+                     "WHERE p.status = 'ENTREGUE' AND h.status = 'ENTREGUE' AND h.data_hora BETWEEN ? AND ?";
         return jdbcTemplate.query(sql, ps -> {
             ps.setObject(1, inicio);
             ps.setObject(2, fim);
@@ -111,8 +130,10 @@ public class PedidoRepositoryJDBC implements PedidoRepository {
 
     @Override
     public List<Pedido> recuperarEntreguesPorClienteEData(String cpf, java.time.LocalDateTime inicio, java.time.LocalDateTime fim) {
-        String sql = "SELECT id, cliente_cpf, status, valor, impostos, desconto, valor_cobrado, data_criacao " +
-                     "FROM pedidos WHERE cliente_cpf = ? AND status = 'ENTREGUE' AND data_criacao BETWEEN ? AND ?";
+        String sql = "SELECT p.id, p.cliente_cpf, p.status, p.valor, p.impostos, p.desconto, p.valor_cobrado, p.data_criacao " +
+                     "FROM pedidos p " +
+                     "JOIN pedido_historico_status h ON h.pedido_id = p.id " +
+                     "WHERE p.cliente_cpf = ? AND p.status = 'ENTREGUE' AND h.status = 'ENTREGUE' AND h.data_hora BETWEEN ? AND ?";
         return jdbcTemplate.query(sql, ps -> {
             ps.setString(1, cpf);
             ps.setObject(2, inicio);
@@ -146,7 +167,7 @@ public class PedidoRepositoryJDBC implements PedidoRepository {
         Cliente cliente = clienteRepository.recuperarPorCpf(clienteCpf);
         if (cliente == null) {
             // Fallback se cliente não encontrado
-            cliente = new Cliente("N/A", "N/A", "N/A", "N/A", "N/A", "N/A");
+            cliente = new Cliente("N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "CLIENTE");
         }
 
         return new Pedido(id, cliente, itens, status, valor, impostos, desconto, valorCobrado, dataCriacao);
