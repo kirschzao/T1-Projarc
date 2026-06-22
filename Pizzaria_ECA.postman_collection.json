@@ -2,12 +2,12 @@
 	"info": {
 		"_postman_id": "a90b4d45-7f99-4621-a5c2-12759e6659c9",
 		"name": "Pizzaria ECA - Test Suite",
-		"description": "Suíte de testes completa e isolada para as Use Cases (UC1 a UC9) e rotas acessórias da Pizzaria ECA. Inclui autenticação básica integrada e separação de contextos por cliente para evitar erros de Acesso Negado.",
+		"description": "Suite de testes da Pizzaria ECA (TF2 - microsservicos). TODO o acesso passa pelo API Gateway (http://localhost:8080).\n\nAutenticacao: o gateway usa JWT Bearer. O login (UC2) captura o token automaticamente na variavel `jwt_token`. Requests que exigem outro usuario (ADMIN, etc.) fazem auto-login via pre-request script.\n\nRotas:\n- /auth/** -> gateway (login/registro, publico)\n- /api/** -> pizzaria-service (StripPrefix=1)\n- /api-estoque/** -> estoque-service\n\nUsuarios do seed (senha 123456): huguinho.pato@email.com (CLIENTE, fidelidade), zezinho.pato@email.com (CLIENTE, dono do pedido 8), patinhas@email.com (ADMIN), margarida@email.com (ADMIN).",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "01. Autenticação e Registro",
+			"name": "01. Autenticacao e Registro",
 			"item": [
 				{
 					"name": "UC1 - Registrar Novo Cliente",
@@ -25,7 +25,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"cpf\": \"9007\",\n  \"nome\": \"Peninha Pato\",\n  \"celular\": \"51999999999\",\n  \"endereco\": \"Rua da Patolândia, 500\",\n  \"email\": \"peninha@email.com\",\n  \"senha\": \"123456\"\n}"
+							"raw": "{\n  \"cpf\": \"9007\",\n  \"nome\": \"Peninha Pato\",\n  \"celular\": \"51999999999\",\n  \"endereco\": \"Rua da Patolandia, 500\",\n  \"email\": \"peninha@email.com\",\n  \"senha\": \"123456\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/auth/registrar",
@@ -37,12 +37,29 @@
 								"registrar"
 							]
 						},
-						"description": "Registra um novo cliente no sistema. Após registrar, você pode alterar a variável `authEmail` da coleção para `peninha@email.com` para realizar as requisições protegidas com esta conta."
+						"description": "Registra um novo cliente (UC11). Rota publica no gateway: /auth/registrar (sem /api)."
 					},
 					"response": []
 				},
 				{
 					"name": "UC2 - Autenticar Cliente (Login)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"if (res && res.token) {",
+									"    pm.collectionVariables.set(\"jwt_token\", res.token);",
+									"    console.log(\"JWT (huguinho) salvo em jwt_token.\");",
+									"} else {",
+									"    console.warn(\"Login nao retornou token:\", JSON.stringify(res));",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "noauth"
@@ -69,96 +86,160 @@
 								"login"
 							]
 						},
-						"description": "Autentica um cliente existente na base (neste exemplo, Huguinho Pato). Retorna se o login foi bem sucedido e os detalhes do usuário."
+						"description": "Autentica Huguinho Pato (UC12). Rota publica: /auth/login. O script de teste salva o JWT retornado (campo `token`) na variavel `jwt_token`, usada por padrao em todas as requisicoes protegidas."
 					},
 					"response": []
 				}
 			]
 		},
 		{
-			"name": "02. Cardápio",
+			"name": "02. Cardapio",
 			"item": [
 				{
-					"name": "UC3 - Carregar Cardápio Corrente",
+					"name": "UC3 - Carregar Cardapio Corrente",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/cardapio/corrente",
+							"raw": "{{baseUrl}}/api/cardapio/corrente",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"api",
 								"cardapio",
 								"corrente"
 							]
 						},
-						"description": "Retorna o cardápio definido atualmente como padrão do sistema (por padrão inicial, ID 1), com todos os itens disponíveis e marcando quais são as sugestões do chef vigentes."
+						"description": "Carrega o cardapio corrente (UC5). Requer estar autenticado (usa jwt_token herdado)."
 					},
 					"response": []
 				},
 				{
-					"name": "Listar Todos os Cardápios",
+					"name": "Listar Todos os Cardapios (ADMIN)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Auto-login como ADMIN (patinhas) -> jwt_admin",
+									"pm.sendRequest({",
+									"    url: pm.collectionVariables.get(\"baseUrl\") + \"/auth/login\",",
+									"    method: \"POST\",",
+									"    header: { \"Content-Type\": \"application/json\" },",
+									"    body: { mode: \"raw\", raw: JSON.stringify({ email: \"patinhas@email.com\", senha: \"123456\" }) }",
+									"}, (err, res) => {",
+									"    if (!err && res.code === 200) pm.collectionVariables.set(\"jwt_admin\", res.json().token);",
+									"    else console.warn(\"Falha no auto-login ADMIN:\", err || res.code);",
+									"});"
+								]
+							}
+						}
+					],
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_admin}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/cardapio/lista",
+							"raw": "{{baseUrl}}/api/cardapio/lista",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"api",
 								"cardapio",
 								"lista"
 							]
 						},
-						"description": "Retorna a listagem de todos os cardápios cadastrados na pizzaria (Clássico, Gourmet, Promocional, etc) com seus respectivos IDs e títulos."
+						"description": "Lista todos os cardapios (UC1 - Adm). Rota restrita a ADMIN no gateway. O pre-request faz login como patinhas@email.com (ADMIN) e usa esse token."
 					},
 					"response": []
 				},
 				{
-					"name": "Carregar Cardápio por ID",
+					"name": "Carregar Cardapio por ID",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/cardapio/2",
+							"raw": "{{baseUrl}}/api/cardapio/2",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"api",
 								"cardapio",
 								"2"
 							]
 						},
-						"description": "Carrega as informações e itens de um cardápio específico via seu ID (no exemplo, o ID 2 representa o Cardápio Gourmet)."
+						"description": "Carrega o cardapio de ID 2. Requer autenticacao (jwt_token herdado)."
 					},
 					"response": []
 				},
 				{
-					"name": "Definir Cardápio Corrente",
+					"name": "Definir Cardapio Corrente (ADMIN)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Auto-login como ADMIN (patinhas) -> jwt_admin",
+									"pm.sendRequest({",
+									"    url: pm.collectionVariables.get(\"baseUrl\") + \"/auth/login\",",
+									"    method: \"POST\",",
+									"    header: { \"Content-Type\": \"application/json\" },",
+									"    body: { mode: \"raw\", raw: JSON.stringify({ email: \"patinhas@email.com\", senha: \"123456\" }) }",
+									"}, (err, res) => {",
+									"    if (!err && res.code === 200) pm.collectionVariables.set(\"jwt_admin\", res.json().token);",
+									"    else console.warn(\"Falha no auto-login ADMIN:\", err || res.code);",
+									"});"
+								]
+							}
+						}
+					],
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_admin}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "PUT",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/cardapio/corrente/2",
+							"raw": "{{baseUrl}}/api/cardapio/corrente/2",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"api",
 								"cardapio",
 								"corrente",
 								"2"
 							]
 						},
-						"description": "Define qual cardápio passa a ser o corrente no sistema (no exemplo, definimos o cardápio ID 2 como corrente). Após essa chamada, o endpoint `/cardapio/corrente` passará a retornar a lista Gourmet."
+						"description": "Define o cardapio ID 2 como corrente (UC2 - Adm). Rota restrita a ADMIN. Pre-request faz login como patinhas@email.com."
 					},
 					"response": []
 				}
 			]
 		},
 		{
-			"name": "03. Gestão de Pedidos",
+			"name": "03. Gestao de Pedidos",
 			"item": [
 				{
 					"name": "A. Fluxo Huguinho (Fidelidade)",
@@ -173,7 +254,7 @@
 											"const response = pm.response.json();",
 											"if (response && response.pedidoId) {",
 											"    pm.collectionVariables.set(\"last_pedido_huguinho_id\", response.pedidoId);",
-											"    console.log(\"Variável 'last_pedido_huguinho_id' atualizada para:\", response.pedidoId);",
+											"    console.log(\"Variavel 'last_pedido_huguinho_id' atualizada para:\", response.pedidoId);",
 											"}"
 										],
 										"type": "text/javascript"
@@ -194,16 +275,17 @@
 									"raw": "{\n  \"enderecoEntrega\": \"Rua das Flores, 100\",\n  \"itens\": [\n    {\n      \"produtoId\": 1,\n      \"quantidade\": 1\n    },\n    {\n      \"produtoId\": 9,\n      \"quantidade\": 1\n    }\n  ]\n}"
 								},
 								"url": {
-									"raw": "{{baseUrl}}/pedidos/submeter",
+									"raw": "{{baseUrl}}/api/pedidos/submeter",
 									"host": [
 										"{{baseUrl}}"
 									],
 									"path": [
+										"api",
 										"pedidos",
 										"submeter"
 									]
 								},
-								"description": "Submete um pedido sob o cliente Huguinho Pato. Como Huguinho tem mais de 3 pedidos entregues, ele ganha desconto automaticamente. Utilizamos os produtos 1 e 9 que possuem receitas e estão 100% funcionais."
+								"description": "Submete pedido como Huguinho (UC6). Huguinho tem >3 pedidos entregues -> recebe desconto de fidelidade. Usa jwt_token herdado."
 							},
 							"response": []
 						},
@@ -213,16 +295,17 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{baseUrl}}/pedidos/{{last_pedido_huguinho_id}}",
+									"raw": "{{baseUrl}}/api/pedidos/{{last_pedido_huguinho_id}}",
 									"host": [
 										"{{baseUrl}}"
 									],
 									"path": [
+										"api",
 										"pedidos",
 										"{{last_pedido_huguinho_id}}"
 									]
 								},
-								"description": "Consulta o status do pedido de Huguinho usando as credenciais dele (herdado da coleção)."
+								"description": "Consulta o status do pedido de Huguinho (UC7). Usa jwt_token herdado."
 							},
 							"response": []
 						},
@@ -232,17 +315,18 @@
 								"method": "POST",
 								"header": [],
 								"url": {
-									"raw": "{{baseUrl}}/pedidos/{{last_pedido_huguinho_id}}/pagar",
+									"raw": "{{baseUrl}}/api/pedidos/{{last_pedido_huguinho_id}}/pagar",
 									"host": [
 										"{{baseUrl}}"
 									],
 									"path": [
+										"api",
 										"pedidos",
 										"{{last_pedido_huguinho_id}}",
 										"pagar"
 									]
 								},
-								"description": "Realiza o pagamento do pedido de Huguinho usando as credenciais dele. O pedido mudará de APROVADO para PAGO."
+								"description": "Paga o pedido de Huguinho (UC9). O pedido passa de APROVADO para PAGO e e encaminhado para a cozinha/entrega. Usa jwt_token herdado."
 							},
 							"response": []
 						},
@@ -252,28 +336,47 @@
 								"method": "POST",
 								"header": [],
 								"url": {
-									"raw": "{{baseUrl}}/pedidos/{{last_pedido_huguinho_id}}/cancelar",
+									"raw": "{{baseUrl}}/api/pedidos/{{last_pedido_huguinho_id}}/cancelar",
 									"host": [
 										"{{baseUrl}}"
 									],
 									"path": [
+										"api",
 										"pedidos",
 										"{{last_pedido_huguinho_id}}",
 										"cancelar"
 									]
 								},
-								"description": "Cancela o pedido do Huguinho (só funciona se estiver APROVADO e antes do pagamento)."
+								"description": "Cancela o pedido de Huguinho (UC8). So funciona se APROVADO e antes do pagamento. Usa jwt_token herdado."
 							},
 							"response": []
 						}
 					]
 				},
 				{
-					"name": "B. Fluxo Margarida (Cliente Novo)",
+					"name": "B. Fluxo Margarida (Sem Fidelidade)",
 					"item": [
 						{
 							"name": "UC4.1 - Submeter Pedido (Sem Desconto)",
 							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"// Auto-login como Margarida -> jwt_margarida",
+											"pm.sendRequest({",
+											"    url: pm.collectionVariables.get(\"baseUrl\") + \"/auth/login\",",
+											"    method: \"POST\",",
+											"    header: { \"Content-Type\": \"application/json\" },",
+											"    body: { mode: \"raw\", raw: JSON.stringify({ email: \"margarida@email.com\", senha: \"123456\" }) }",
+											"}, (err, res) => {",
+											"    if (!err && res.code === 200) pm.collectionVariables.set(\"jwt_margarida\", res.json().token);",
+											"    else console.warn(\"Falha no auto-login Margarida:\", err || res.code);",
+											"});"
+										]
+									}
+								},
 								{
 									"listen": "test",
 									"script": {
@@ -281,7 +384,7 @@
 											"const response = pm.response.json();",
 											"if (response && response.pedidoId) {",
 											"    pm.collectionVariables.set(\"last_pedido_margarida_id\", response.pedidoId);",
-											"    console.log(\"Variável 'last_pedido_margarida_id' atualizada para:\", response.pedidoId);",
+											"    console.log(\"Variavel 'last_pedido_margarida_id' atualizada para:\", response.pedidoId);",
 											"}"
 										],
 										"type": "text/javascript"
@@ -290,16 +393,11 @@
 							],
 							"request": {
 								"auth": {
-									"type": "basic",
-									"basic": [
+									"type": "bearer",
+									"bearer": [
 										{
-											"key": "password",
-											"value": "123456",
-											"type": "string"
-										},
-										{
-											"key": "username",
-											"value": "margarida@email.com",
+											"key": "token",
+											"value": "{{jwt_margarida}}",
 											"type": "string"
 										}
 									]
@@ -317,33 +415,49 @@
 									"raw": "{\n  \"enderecoEntrega\": \"Av. das Flores, 88\",\n  \"itens\": [\n    {\n      \"produtoId\": 2,\n      \"quantidade\": 1\n    }\n  ]\n}"
 								},
 								"url": {
-									"raw": "{{baseUrl}}/pedidos/submeter",
+									"raw": "{{baseUrl}}/api/pedidos/submeter",
 									"host": [
 										"{{baseUrl}}"
 									],
 									"path": [
+										"api",
 										"pedidos",
 										"submeter"
 									]
 								},
-								"description": "Submete o pedido para a Margarida Pato usando explicitamente as credenciais dela. Margarida não recebe descontos pois não tem histórico de compras."
+								"description": "Submete pedido como Margarida. Pre-request faz login como margarida@email.com. Margarida nao tem historico de pedidos -> sem desconto de fidelidade."
 							},
 							"response": []
 						},
 						{
 							"name": "UC5.2 - Consultar Status do Pedido",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"// Auto-login como Margarida -> jwt_margarida",
+											"pm.sendRequest({",
+											"    url: pm.collectionVariables.get(\"baseUrl\") + \"/auth/login\",",
+											"    method: \"POST\",",
+											"    header: { \"Content-Type\": \"application/json\" },",
+											"    body: { mode: \"raw\", raw: JSON.stringify({ email: \"margarida@email.com\", senha: \"123456\" }) }",
+											"}, (err, res) => {",
+											"    if (!err && res.code === 200) pm.collectionVariables.set(\"jwt_margarida\", res.json().token);",
+											"    else console.warn(\"Falha no auto-login Margarida:\", err || res.code);",
+											"});"
+										]
+									}
+								}
+							],
 							"request": {
 								"auth": {
-									"type": "basic",
-									"basic": [
+									"type": "bearer",
+									"bearer": [
 										{
-											"key": "password",
-											"value": "123456",
-											"type": "string"
-										},
-										{
-											"key": "username",
-											"value": "margarida@email.com",
+											"key": "token",
+											"value": "{{jwt_margarida}}",
 											"type": "string"
 										}
 									]
@@ -351,33 +465,49 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{baseUrl}}/pedidos/{{last_pedido_margarida_id}}",
+									"raw": "{{baseUrl}}/api/pedidos/{{last_pedido_margarida_id}}",
 									"host": [
 										"{{baseUrl}}"
 									],
 									"path": [
+										"api",
 										"pedidos",
 										"{{last_pedido_margarida_id}}"
 									]
 								},
-								"description": "Consulta o status do pedido de Margarida usando as credenciais explícitas dela."
+								"description": "Consulta o status do pedido de Margarida. Pre-request faz login como margarida@email.com."
 							},
 							"response": []
 						},
 						{
 							"name": "UC6.1 - Cancelar Pedido",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"// Auto-login como Margarida -> jwt_margarida",
+											"pm.sendRequest({",
+											"    url: pm.collectionVariables.get(\"baseUrl\") + \"/auth/login\",",
+											"    method: \"POST\",",
+											"    header: { \"Content-Type\": \"application/json\" },",
+											"    body: { mode: \"raw\", raw: JSON.stringify({ email: \"margarida@email.com\", senha: \"123456\" }) }",
+											"}, (err, res) => {",
+											"    if (!err && res.code === 200) pm.collectionVariables.set(\"jwt_margarida\", res.json().token);",
+											"    else console.warn(\"Falha no auto-login Margarida:\", err || res.code);",
+											"});"
+										]
+									}
+								}
+							],
 							"request": {
 								"auth": {
-									"type": "basic",
-									"basic": [
+									"type": "bearer",
+									"bearer": [
 										{
-											"key": "password",
-											"value": "123456",
-											"type": "string"
-										},
-										{
-											"key": "username",
-											"value": "margarida@email.com",
+											"key": "token",
+											"value": "{{jwt_margarida}}",
 											"type": "string"
 										}
 									]
@@ -385,39 +515,55 @@
 								"method": "POST",
 								"header": [],
 								"url": {
-									"raw": "{{baseUrl}}/pedidos/{{last_pedido_margarida_id}}/cancelar",
+									"raw": "{{baseUrl}}/api/pedidos/{{last_pedido_margarida_id}}/cancelar",
 									"host": [
 										"{{baseUrl}}"
 									],
 									"path": [
+										"api",
 										"pedidos",
 										"{{last_pedido_margarida_id}}",
 										"cancelar"
 									]
 								},
-								"description": "Cancela o pedido de Margarida usando as credenciais explícitas dela."
+								"description": "Cancela o pedido de Margarida. Pre-request faz login como margarida@email.com."
 							},
 							"response": []
 						}
 					]
 				},
 				{
-					"name": "C. Histórico e Outros",
+					"name": "C. Historico e Outros",
 					"item": [
 						{
-							"name": "UC5.1 - Consultar Status de Pedido Histórico (Luizinho)",
+							"name": "UC5.1 - Consultar Pedido Historico (Zezinho)",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"// Auto-login como dono do pedido 8 (CPF 9002 -> zezinho.pato@email.com) -> jwt_zezinho",
+											"pm.sendRequest({",
+											"    url: pm.collectionVariables.get(\"baseUrl\") + \"/auth/login\",",
+											"    method: \"POST\",",
+											"    header: { \"Content-Type\": \"application/json\" },",
+											"    body: { mode: \"raw\", raw: JSON.stringify({ email: \"zezinho.pato@email.com\", senha: \"123456\" }) }",
+											"}, (err, res) => {",
+											"    if (!err && res.code === 200) pm.collectionVariables.set(\"jwt_zezinho\", res.json().token);",
+											"    else console.warn(\"Falha no auto-login Zezinho:\", err || res.code);",
+											"});"
+										]
+									}
+								}
+							],
 							"request": {
 								"auth": {
-									"type": "basic",
-									"basic": [
+									"type": "bearer",
+									"bearer": [
 										{
-											"key": "password",
-											"value": "123456",
-											"type": "string"
-										},
-										{
-											"key": "username",
-											"value": "zezinho.pato@email.com",
+											"key": "token",
+											"value": "{{jwt_zezinho}}",
 											"type": "string"
 										}
 									]
@@ -425,30 +571,32 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{baseUrl}}/pedidos/8",
+									"raw": "{{baseUrl}}/api/pedidos/8",
 									"host": [
 										"{{baseUrl}}"
 									],
 									"path": [
+										"api",
 										"pedidos",
 										"8"
-							]
+									]
 								},
-								"description": "Consulta o pedido ID 8 (pré-populado no data.sql). Como ele pertence ao CPF 9002 (Luizinho Pato, cujo e-mail cadastrado no seed é zezinho.pato@email.com), passamos explicitamente a autenticação dele para não haver 403."
+								"description": "Consulta o pedido ID 8 (pre-populado no data.sql, status APROVADO). Pertence ao CPF 9002, cujo email no seed e zezinho.pato@email.com. Pre-request faz login com esse usuario para evitar 403."
 							},
 							"response": []
 						},
 						{
-							"name": "UC8 - Listar Pedidos Entregues (Período Geral)",
+							"name": "UC8 - Listar Pedidos Entregues (Periodo Geral)",
 							"request": {
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{baseUrl}}/pedidos/entregues?inicio=2026-05-01T00:00:00&fim=2026-05-31T23:59:59",
+									"raw": "{{baseUrl}}/api/pedidos/entregues?inicio=2026-05-01T00:00:00&fim=2026-05-31T23:59:59",
 									"host": [
 										"{{baseUrl}}"
 									],
 									"path": [
+										"api",
 										"pedidos",
 										"entregues"
 									],
@@ -463,7 +611,7 @@
 										}
 									]
 								},
-								"description": "Retorna todos os pedidos de todos os clientes que estão no status `ENTREGUE` no período de datas selecionado (maio de 2026)."
+								"description": "Lista pedidos ENTREGUE no periodo (UC10). Usa jwt_token herdado."
 							},
 							"response": []
 						},
@@ -473,11 +621,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{baseUrl}}/pedidos/entregues/meus?inicio=2026-05-01T00:00:00&fim=2026-05-31T23:59:59",
+									"raw": "{{baseUrl}}/api/pedidos/entregues/meus?inicio=2026-05-01T00:00:00&fim=2026-05-31T23:59:59",
 									"host": [
 										"{{baseUrl}}"
 									],
 									"path": [
+										"api",
 										"pedidos",
 										"entregues",
 										"meus"
@@ -493,7 +642,7 @@
 										}
 									]
 								},
-								"description": "Retorna a listagem dos pedidos que pertencem estritamente ao cliente atualmente logado no cabeçalho Basic Auth (`authEmail`) e que foram concluídos/entregues no período definido."
+								"description": "Lista os pedidos entregues do usuario logado (Huguinho, via jwt_token herdado) no periodo."
 							},
 							"response": []
 						}
@@ -505,29 +654,30 @@
 			"name": "04. Utilidades",
 			"item": [
 				{
-					"name": "Visualizar Docs do Scalar",
+					"name": "Visualizar Docs do Scalar (via gateway)",
 					"request": {
-						"auth": {
-							"type": "noauth"
-						},
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/docs",
+							"raw": "{{baseUrl}}/api/docs",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"api",
 								"docs"
 							]
 						},
-						"description": "Carrega a interface interativa gerada pelo Scalar com a especificação da API."
+						"description": "Abre o Scalar do pizzaria-service atraves do gateway (/api/docs -> StripPrefix -> /docs). Requer autenticacao (jwt_token herdado). Para abrir no navegador, prefira rodar o pizzaria-service com a porta exposta e acessar http://localhost:8081/docs."
 					},
 					"response": []
 				},
 				{
-					"name": "Boas Vindas (Health Check)",
+					"name": "Gateway - Rota Raiz (404 esperado)",
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
@@ -539,7 +689,7 @@
 								""
 							]
 						},
-						"description": "Endpoint básico para verificação de funcionamento e integridade da aplicação."
+						"description": "O gateway nao tem rota para a raiz '/'. Retornar 404 (Whitelabel Error Page) aqui e o comportamento esperado e indica que o gateway esta no ar. Use as rotas /auth/** e /api/** para acessar a aplicacao."
 					},
 					"response": []
 				}
@@ -573,13 +723,23 @@
 			"type": "string"
 		},
 		{
-			"key": "authEmail",
-			"value": "huguinho.pato@email.com",
+			"key": "jwt_token",
+			"value": "",
 			"type": "string"
 		},
 		{
-			"key": "authPassword",
-			"value": "123456",
+			"key": "jwt_admin",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "jwt_margarida",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "jwt_zezinho",
+			"value": "",
 			"type": "string"
 		},
 		{
@@ -594,16 +754,11 @@
 		}
 	],
 	"auth": {
-		"type": "basic",
-		"basic": [
+		"type": "bearer",
+		"bearer": [
 			{
-				"key": "password",
-				"value": "{{authPassword}}",
-				"type": "string"
-			},
-			{
-				"key": "username",
-				"value": "{{authEmail}}",
+				"key": "token",
+				"value": "{{jwt_token}}",
 				"type": "string"
 			}
 		]
